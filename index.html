@@ -174,7 +174,19 @@ function parseCSV(csv) {
   const delimiter =
     header.includes(";") && !header.includes(",") ? ";" : ",";
 
-  console.log("Header:", header, "Delimiter:", delimiter);
+  const headerCols = header.split(delimiter);
+  console.log("Header-kolumner:", headerCols, "Delimiter:", delimiter);
+
+  // hitta index baserat på rubriknamn
+  const idxName = headerCols.indexOf("Namn");
+  const idxTime = headerCols.indexOf("Tid (i sekunder)");
+  const idxCat  = headerCols.indexOf("Kategori");
+  const idxDate = headerCols.indexOf("Datum");
+
+  if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
+    console.error("Hittar inte alla rubriker i CSV:", headerCols);
+    return;
+  }
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -182,30 +194,28 @@ function parseCSV(csv) {
 
     const c = line.split(delimiter);
 
-    // förväntad ordning: [Tidsstämpel, Namn, Tid, Kategori, Datum]
-    const name = (c[1] || "").trim();
-    const rawTime = (c[2] || "").trim();
-    const cat  = (c[3] || "").trim();
-    const date = (c[4] || "").trim();
+    const name    = (c[idxName] || "").trim();
+    const rawTime = (c[idxTime] || "").trim();
+    const cat     = (c[idxCat]  || "").trim();
+    const date    = (c[idxDate] || "").trim();
 
-    // försök tolka tid som tal, men kasta inte bort raden om det misslyckas
     let timeNumber = Number(rawTime.replace(",", "."));
     if (isNaN(timeNumber)) {
-      timeNumber = null;
+      timeNumber = null; // vi kastar inte raden pga detta
     }
 
     if (!name || !date) continue; // bara krav: namn + datum
 
     rows.push({
       name,
-      time: timeNumber,   // kan vara null
-      timeRaw: rawTime,   // originaltext, visas om time är null
+      time: timeNumber,
+      timeRaw: rawTime,
       cat,
       date
     });
   }
 
-  console.log("Antal rader efter parsningslogik:", rows.length);
+  console.log("Antal rader efter parsning:", rows.length);
   allResults = rows;
   buildDateDropdown();
   updateDonation();
