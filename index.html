@@ -144,32 +144,54 @@ select {
 
 <script>
 const CSV_URL =
-"https://docs.google.com/spreadsheets/d/1tAOi5eIdDWxUh5AkWQa-q9j4yD10QjAwi1Hcg5k9tyI/export?format=csv&gid=851007371";
+  "https://docs.google.com/spreadsheets/d/1tAOi5eIdDWxUh5AkWQa-q9j4yD10QjAwi1Hcg5k9tyI/export?format=csv&gid=851007371";
 
 const DONATION = 50;
 let allResults = [];
 
+// Hämta CSV från Google Sheets
 async function loadCSV() {
-  const res = await fetch(CSV_URL);
-  const text = await res.text();
-  parseCSV(text);
+  try {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    console.log("CSV hämtad, längd:", text.length);
+    parseCSV(text);
+  } catch (e) {
+    console.error("Fel vid hämtning av CSV:", e);
+  }
 }
 
 function parseCSV(csv) {
-  const lines = csv.trim().split("\n");
+  const lines = csv.trim().split(/\r?\n/);
   const rows = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const c = lines[i].split(",");
-    const name = c[1];
-    const time = Number(c[2]);
-    const cat  = c[3];
-    const date = c[4];
-
-    if (!name || !date || isNaN(time)) continue;
-    rows.push({name, time, cat, date});
+  if (lines.length < 2) {
+    console.warn("CSV verkar tom");
+    return;
   }
 
+  // lista ut om det är ; eller , som avgränsare
+  const header = lines[0];
+  const delimiter =
+    header.includes(";") && !header.includes(",") ? ";" : ",";
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    const c = line.split(delimiter);
+
+    const name = (c[1] || "").trim();
+    const rawTime = (c[2] || "").trim();
+    const cat  = (c[3] || "").trim();
+    const date = (c[4] || "").trim();
+
+    const time = Number(rawTime.replace(",", "."));
+
+    if (!name || !date || isNaN(time)) continue;
+    rows.push({ name, time, cat, date });
+  }
+
+  console.log("Antal giltiga rader:", rows.length);
   allResults = rows;
   buildDateDropdown();
   updateDonation();
@@ -189,7 +211,10 @@ function buildDateDropdown() {
   });
 
   sel.onchange = render;
-  if (dates.length > 0) render();
+  if (dates.length > 0) {
+    sel.value = dates[0];
+    render();
+  }
 }
 
 function updateDonation() {
@@ -207,8 +232,8 @@ function render() {
 
     const list = filtered
       .filter(r => r.cat === cat)
-      .sort((a,b) => a.time - b.time)
-      .slice(0,5);
+      .sort((a,b) => a.time - b.time)   // snabbast först
+      .slice(0,5);                      // topp 5
 
     if (list.length === 0) {
       tbody.innerHTML = `<tr><td colspan=2>Inga resultat</td></tr>`;
