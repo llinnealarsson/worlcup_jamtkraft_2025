@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<title>Jämtkraft World Cup 2025 - Resultat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+body {
+  background: #fff9cc;
+  font-family: Arial, sans-serif;
+  padding: 30px;
+}
+
+h1 {
+  font-size: 44px;
+  margin: 0 0 10px 0;
+}
+
+#donationBox {
+  font-size: 60px;
+  font-weight: bold;
+  color: #ff9900;
+}
+
+.receiver {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.top-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-box {
+  width: 45%;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.logo-box img {
+  max-width: 100%;
+  max-height: 260px;
+}
+
+.tables-area {
+  margin-top: 30px;
+  display: flex;
+  gap: 20px;
+}
+
+.cat-box {
+  flex: 1;
+  background: #006888;
+  padding: 14px;
+  border-radius: 16px;
+  color: white;
+}
+
+.cat-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 20px;
+}
+
+th, td {
+  padding: 4px 6px;
+}
+
+tbody tr:nth-child(odd) td {
+  background: rgba(255,255,255,0.12);
+}
+
+select {
+  font-size: 18px;
+  padding: 4px 8px;
+  margin-bottom: 6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="top-area">
+
+  <div>
+    <label for="dateSelect"><b>Datum:</b></label>
+    <select id="dateSelect"></select>
+
+    <h1>Tillsammans har vi samlat in</h1>
+    <div id="donationBox">0:-</div>
+    <div class="receiver">till Nattvandrarna Östersund</div>
+    <div style="margin-top:6px;">(50 kr/resultat)</div>
+  </div>
+
+  <div class="logo-box">
+    <img src="jamtkraft_logo.png" alt="Jämtkraft">
+  </div>
+
+</div>
+
+<div class="tables-area">
+
+  <div class="cat-box">
+    <div class="cat-title">Dam</div>
+    <table>
+      <thead><tr><th>Namn</th><th>Tid</th></tr></thead>
+      <tbody id="Dam"></tbody>
+    </table>
+  </div>
+
+  <div class="cat-box">
+    <div class="cat-title">Herr</div>
+    <table>
+      <thead><tr><th>Namn</th><th>Tid</th></tr></thead>
+      <tbody id="Herr"></tbody>
+    </table>
+  </div>
+
+  <div class="cat-box">
+    <div class="cat-title">Ungdom</div>
+    <table>
+      <thead><tr><th>Namn</th><th>Tid</th></tr></thead>
+      <tbody id="Ungdom"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv;  // <= BYT DENNA
+
+const DONATION = 50;
+let allResults = [];
+
+async function loadCSV() {
+  const res = await fetch(CSV_URL);
+  const text = await res.text();
+  parseCSV(text);
+}
+
+function parseCSV(csv) {
+  const lines = csv.trim().split("\n");
+  const rows = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(",");
+    const name = c[1];
+    const time = Number(c[2]);
+    const cat  = c[3];
+    const date = c[4];
+
+    if (!name || !date || isNaN(time)) continue;
+    rows.push({name, time, cat, date});
+  }
+
+  allResults = rows;
+  buildDateDropdown();
+  updateDonation();
+}
+
+function buildDateDropdown() {
+  const sel = document.getElementById("dateSelect");
+  sel.innerHTML = "";
+
+  const dates = [...new Set(allResults.map(r => r.date))].sort();
+
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.textContent = d;
+    opt.value = d;
+    sel.appendChild(opt);
+  });
+
+  sel.onchange = render;
+  if (dates.length > 0) render();
+}
+
+function updateDonation() {
+  const total = allResults.length * DONATION;
+  document.getElementById("donationBox").textContent = total + ":-";
+}
+
+function render() {
+  const date = document.getElementById("dateSelect").value;
+  const filtered = allResults.filter(r => r.date === date);
+
+  ["Dam","Herr","Ungdom"].forEach(cat => {
+    const tbody = document.getElementById(cat);
+    tbody.innerHTML = "";
+
+    const list = filtered
+      .filter(r => r.cat === cat)
+      .sort((a,b) => a.time - b.time)
+      .slice(0,5);
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan=2>Inga resultat</td></tr>`;
+      return;
+    }
+
+    list.forEach(r => {
+      tbody.innerHTML += `<tr><td>${r.name}</td><td>${r.time}</td></tr>`;
+    });
+  });
+}
+
+loadCSV();
+</script>
+
+</body>
+</html>
