@@ -237,8 +237,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     loadData();
-    // Auto-reload av HELA sidan var 5:e sekund
-    setInterval(() => window.location.reload(), REFRESH_MS);
+    setInterval(loadData, REFRESH_MS);
   });
 
   function loadData() {
@@ -376,9 +375,6 @@
     });
   }
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
