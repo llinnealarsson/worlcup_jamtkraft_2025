@@ -12,28 +12,33 @@
       margin: 0;
     }
 
+    /* Rubrik + "till Nattvandring" – samma storlek */
     h1 {
-      font-size: 52px;     /* större rubrik */
+      font-size: 46px;     /* samma som .receiver */
       margin: 0 0 10px 0;
+      text-align: center;  /* centreras inom vänsterpanelen */
     }
 
     #donationBox {
-      font-size: 80px;     /* större summa */
+      font-size: 80px;     /* stor summa */
       font-weight: bold;
       color: #ff9900;
       line-height: 1;
       margin-top: 10px;
       margin-bottom: 10px;
+      text-align: center;  /* också centrerad */
     }
 
     .receiver {
-      font-size: 36px;     /* större text "till Nattvandring" */
+      font-size: 46px;     /* samma som h1 */
       font-weight: bold;
+      text-align: center;  /* centreras inom vänsterpanelen */
     }
 
     .date-row {
       margin-bottom: 10px;
       font-size: 20px;
+      /* datumet lämnar vi vänsterjusterat */
     }
 
     select {
@@ -45,6 +50,7 @@
     .small-text {
       margin-top: 12px;
       font-size: 16px;
+      text-align: center;  /* också centrerad i vänsterpanelen */
     }
 
     /* ---------- LAYOUT ---------- */
@@ -85,6 +91,7 @@
       align-items: center;
       gap: 12px;
       margin-top: 16px;
+      justify-content: center;  /* centrera raden med text + logga */
     }
 
     .receiver-logo {
