@@ -12,33 +12,31 @@
       margin: 0;
     }
 
-    /* Rubrik + "till Nattvandring" – samma storlek */
     h1 {
-      font-size: 60px;     /* samma som .receiver */
+      font-size: 60px;
       margin: 30px 0 10px 0;
-      text-align: center;  /* centreras inom vänsterpanelen */
+      text-align: center;
     }
 
     #donationBox {
-      font-size: 90px;     /* stor summa */
+      font-size: 90px;
       font-weight: bold;
       color: #E10600;
       line-height: 1;
       margin-top: 10px;
       margin-bottom: 10px;
-      text-align: center;  /* också centrerad */
+      text-align: center;
     }
 
     .receiver {
-      font-size: 60px;     /* samma som h1 */
+      font-size: 60px;
       font-weight: bold;
-      text-align: center;  /* centreras inom vänsterpanelen */
+      text-align: center;
     }
 
     .date-row {
       margin-bottom: 7px;
       font-size: 14px;
-      /* datumet lämnar vi vänsterjusterat */
     }
 
     select {
@@ -47,17 +45,13 @@
       margin-left: 8px;
     }
 
-    /* Datum absolut högst upp i vänstra hörnet */
     .absolute-date {
       position: absolute;
-      top: 10px;   /* justera vid behov */
-      left: 20px;  /* justera vid behov */
+      top: 10px;
+      left: 20px;
       z-index: 1000;
     }
 
-    /* ---------- LAYOUT ---------- */
-
-    /* Övre rad: vänster (donation) + höger (Jämtkraft) */
     .top-row {
       display: flex;
       justify-content: space-between;
@@ -75,11 +69,11 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      margin-top: 100px; /* flyttar ner loggan */
+      margin-top: 100px;
     }
 
     .logo-box-main {
-      width: 900px;        /* större Jämtkraft-logga */
+      width: 900px;
       max-width: 100%;
     }
 
@@ -89,13 +83,12 @@
       display: block;
     }
 
-    /* Nattvandrar-logga bredvid texten */
     .receiver-row {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-top: 16px;
-      justify-content: center;  /* centrera raden med text + logga */
+      justify-content: center;
     }
 
     .receiver-logo {
@@ -103,9 +96,8 @@
       width: auto;
     }
 
-    /* Nedre rad: hela bredden, resultat längre ner */
     .bottom-row {
-      margin-top: 300px;    /* flytta resultaten nedåt */
+      margin-top: 300px;
     }
 
     .tables-area {
@@ -180,12 +172,8 @@
   <select id="dateSelect"></select>
 </div>
 
-<!-- ÖVRE DEL: vit + lila rektangel -->
 <div class="top-row">
-
-  <!-- Vänster: donation + nattvandrarnas logga -->
   <div class="left-panel">
-
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
 
@@ -193,19 +181,15 @@
       <div class="receiver">till Nattvandring</div>
       <img class="receiver-logo" src="nattvandring.png" alt="Nattvandring">
     </div>
-
   </div>
 
-  <!-- Höger: Jämtkraft-logga -->
   <div class="right-panel">
     <div class="logo-box-main">
       <img src="jamtkraft_primar.png" alt="Jämtkraft">
     </div>
   </div>
-
 </div>
 
-<!-- NEDRE DEL -->
 <div class="bottom-row">
   <div class="tables-area">
     <div class="cat-box">
@@ -235,7 +219,6 @@
 </div>
 
 <script>
-  // Länk till publicerad Rådata-CSV
   const CSV_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
@@ -243,9 +226,18 @@
   const REFRESH_MS = 5000;
 
   let allResults = [];
-  let selectedDate = null;
+  let selectedDate = null;      // globalt valt datum
+  let dateSelectEl = null;      // referens till select-elementet
 
   document.addEventListener("DOMContentLoaded", () => {
+    dateSelectEl = document.getElementById("dateSelect");
+
+    // Sätt onchange EN gång här
+    dateSelectEl.addEventListener("change", () => {
+      selectedDate = dateSelectEl.value;
+      renderForDate(selectedDate);
+    });
+
     loadData();
     setInterval(loadData, REFRESH_MS);
   });
@@ -261,7 +253,6 @@
       .catch(err => console.error("Fel vid hämtning av CSV:", err));
   }
 
-  // Parsar CSV med rubriker: Namn / Tid (i sekunder) / Kategori / Datum
   function parseCsv(text) {
     const lines = text.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
@@ -302,10 +293,10 @@
   }
 
   function updateDateSelect() {
-    const sel = document.getElementById("dateSelect");
+    const sel = dateSelectEl;
 
     const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const previous = selectedDate || sel.value || null;
+    const previous = selectedDate;   // <-- ändrat: vi litar på globalt vald dag
 
     sel.innerHTML = "";
 
@@ -323,18 +314,15 @@
     }
 
     if (previous && dates.includes(previous)) {
+      // Behåll användarens val om datumet fortfarande finns
       selectedDate = previous;
     } else {
-      selectedDate = dates[0];
+      // Annars välj SENASTE datumet
+      selectedDate = dates[dates.length - 1];   // <-- ändrat från dates[0]
     }
 
     sel.value = selectedDate;
     renderForDate(selectedDate);
-
-    sel.onchange = () => {
-      selectedDate = sel.value;
-      renderForDate(selectedDate);
-    };
   }
 
   function clearTables() {
