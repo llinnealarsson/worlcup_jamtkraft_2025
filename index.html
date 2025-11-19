@@ -38,6 +38,7 @@
     .date-row {
       margin-bottom: 7px;
       font-size: 14px;
+      /* datumet lämnar vi vänsterjusterat */
     }
 
     select {
@@ -179,11 +180,12 @@
   <select id="dateSelect"></select>
 </div>
 
-<!-- ÖVRE DEL -->
+<!-- ÖVRE DEL: vit + lila rektangel -->
 <div class="top-row">
 
   <!-- Vänster: donation + nattvandrarnas logga -->
   <div class="left-panel">
+
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
 
@@ -191,6 +193,7 @@
       <div class="receiver">till Nattvandring</div>
       <img class="receiver-logo" src="nattvandring.png" alt="Nattvandring">
     </div>
+
   </div>
 
   <!-- Höger: Jämtkraft-logga -->
@@ -237,11 +240,10 @@
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
   const DONATION_PER_RESULT = 50;
-  const REFRESH_MS = 10000; // 10 sekunders intervall
+  const REFRESH_MS = 5000;
 
   let allResults = [];
   let selectedDate = null;
-  let lastSerialized = null; // används för att se om CSV-innehållet faktiskt ändrats
 
   document.addEventListener("DOMContentLoaded", () => {
     loadData();
@@ -252,24 +254,7 @@
     fetch(CSV_URL)
       .then(res => res.text())
       .then(text => {
-        const newResults = parseCsv(text);
-        const serialized = JSON.stringify(newResults);
-
-        // 1) Om inget har ändrats → gör ingenting (ingen blink)
-        if (serialized === lastSerialized) {
-          return;
-        }
-
-        // 2) Om vi redan har fler rader än den nya datan → ignorera (stale snapshot)
-        if (allResults.length && newResults.length < allResults.length) {
-          console.warn("Ignorerar äldre/stale CSV-version");
-          return;
-        }
-
-        // 3) Annars: acceptera den nya datan
-        lastSerialized = serialized;
-        allResults = newResults;
-
+        allResults = parseCsv(text);
         updateDonation();
         updateDateSelect();
       })
@@ -400,6 +385,9 @@
     });
   }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
