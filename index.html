@@ -1,260 +1,321 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<title>Jämtkraft World Cup 2025 - Resultat</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Jämtkraft World Cup 2025 - Resultat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #fff9cc;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      margin: 0;
+    }
 
-<style>
-body {
-  background: #fff9cc;
-  font-family: Arial, sans-serif;
-  padding: 30px;
-}
+    h1 {
+      font-size: 44px;
+      margin: 0 0 10px 0;
+    }
 
-h1 {
-  font-size: 44px;
-  margin: 0 0 10px 0;
-}
+    #donationBox {
+      font-size: 60px;
+      font-weight: bold;
+      color: #ff9900;
+    }
 
-#donationBox {
-  font-size: 60px;
-  font-weight: bold;
-  color: #ff9900;
-}
+    .receiver {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
 
-.receiver {
-  font-size: 32px;
-  font-weight: bold;
-  margin-top: 6px;
-}
+    .top-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+    }
 
-.top-area {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .left-top {
+      flex: 1;
+    }
 
-.logo-box {
-  width: 45%;
-  border-radius: 20px;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
+    .logo-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
 
-.logo-box img {
-  max-width: 100%;
-  max-height: 260px;
-}
+    .logo-box-main {
+      width: 420px;
+      max-width: 100%;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
 
-.tables-area {
-  margin-top: 30px;
-  display: flex;
-  gap: 20px;
-}
+    .logo-box-main img {
+      max-width: 100%;
+      height: auto;
+    }
 
-.cat-box {
-  flex: 1;
-  background: #006888;
-  padding: 14px;
-  border-radius: 16px;
-  color: white;
-}
+    .logo-box-small img {
+      max-width: 160px;
+      height: auto;
+    }
 
-.cat-title {
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
+    .date-row {
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 20px;
-}
+    select {
+      font-size: 18px;
+      padding: 4px 8px;
+      margin-left: 8px;
+    }
 
-th, td {
-  padding: 4px 6px;
-}
+    .small-text {
+      margin-top: 6px;
+      font-size: 16px;
+    }
 
-tbody tr:nth-child(odd) td {
-  background: rgba(255,255,255,0.12);
-}
+    .tables-area {
+      margin-top: 40px;
+      display: flex;
+      gap: 20px;
+    }
 
-select {
-  font-size: 18px;
-  padding: 4px 8px;
-  margin-bottom: 6px;
-}
+    .cat-box {
+      flex: 1;
+      background: #006888;
+      padding: 14px;
+      border-radius: 16px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
 
-</style>
+    .cat-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;
+    }
+
+    th, td {
+      padding: 4px 6px;
+    }
+
+    th {
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      text-align: right;
+    }
+
+    tbody tr:nth-child(odd) td {
+      background: rgba(255,255,255,0.10);
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+      .top-area {
+        flex-direction: column;
+      }
+      .tables-area {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
 <div class="top-area">
-
-  <div>
-    <label for="dateSelect"><b>Datum:</b></label>
-    <select id="dateSelect"></select>
+  <div class="left-top">
+    <div class="date-row">
+      <label for="dateSelect"><b>Datum:</b></label>
+      <select id="dateSelect"></select>
+    </div>
 
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
-    <div class="receiver">till Nattvandrarna Östersund</div>
-    <div style="margin-top:6px;"></div>
+    <div class="receiver">
+      till Nattvandring
+    </div>
+    <div class="small-text">
+      50 kr doneras för varje genomfört resultat.
+    </div>
   </div>
 
-  <div class="logo-box">
-    <img src="jamtkraft_primar.png" alt="Jämtkraft">
+  <div class="logo-area">
+    <div class="logo-box-main">
+      <img src="jamtkraft_primar.png" alt="Jämtkraft">
+    </div>
+    <div class="logo-box-small">
+      <img src="nattvandring.png" alt="Nattvandring">
+    </div>
   </div>
-
 </div>
 
 <div class="tables-area">
-
   <div class="cat-box">
     <div class="cat-title">Dam</div>
     <table>
-      <thead><tr><th>Namn</th><th>Tid</th></tr></thead>
-      <tbody id="Dam"></tbody>
+      <thead>
+        <tr><th>Namn</th><th>Tid (s)</th></tr>
+      </thead>
+      <tbody id="dam-body"></tbody>
     </table>
   </div>
 
   <div class="cat-box">
     <div class="cat-title">Herr</div>
     <table>
-      <thead><tr><th>Namn</th><th>Tid</th></tr></thead>
-      <tbody id="Herr"></tbody>
+      <thead>
+        <tr><th>Namn</th><th>Tid (s)</th></tr>
+      </thead>
+      <tbody id="herr-body"></tbody>
     </table>
   </div>
 
   <div class="cat-box">
     <div class="cat-title">Ungdom</div>
     <table>
-      <thead><tr><th>Namn</th><th>Tid</th></tr></thead>
-      <tbody id="Ungdom"></tbody>
+      <thead>
+        <tr><th>Namn</th><th>Tid (s)</th></tr>
+      </thead>
+      <tbody id="ungdom-body"></tbody>
     </table>
   </div>
-
 </div>
 
 <script>
-<script>
-const CSV_URL =
-  "https://docs.google.com/spreadsheets/d/1tAOi5eIdDWxUh5AkWQa-q9j4yD10QjAwi1Hcg5k9tyI/export?format=csv&gid=851007371";
+  // Länk till publicerad Rådata-CSV
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
-const DONATION = 50;
-let allResults = [];
+  const DONATION_PER_RESULT = 50;
 
-// Hämta CSV från Google Sheets
-async function loadCSV() {
-  try {
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-    parseCSV(text);
-  } catch (e) {
-    console.error("Fel vid hämtning av CSV:", e);
-  }
-}
+  let allResults = [];
 
-// Parsa CSV via rubrikerna: Namn, Tid (i sekunder), Kategori, Datum
-function parseCSV(csv) {
-  const lines = csv.trim().split(/\r?\n/);
-  if (lines.length < 2) return;
-
-  // lista ut om det är ; eller , som avgränsare
-  const headerLine = lines[0];
-  const delimiter =
-    headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
-
-  const headerCols = headerLine.split(delimiter);
-
-  const idxName = headerCols.indexOf("Namn");
-  const idxTime = headerCols.indexOf("Tid (i sekunder)");
-  const idxCat  = headerCols.indexOf("Kategori");
-  const idxDate = headerCols.indexOf("Datum");
-
-  if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
-    console.error("Rubriker hittades inte:", headerCols);
-    return;
-  }
-
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
-    const cols = line.split(delimiter);
-
-    const name    = (cols[idxName] || "").trim();
-    const rawTime = (cols[idxTime] || "").trim();
-    const cat     = (cols[idxCat]  || "").trim();
-    const date    = (cols[idxDate] || "").trim();
-
-    if (!name || !date) continue;
-
-    const numTime = Number(rawTime.replace(",", "."));
-    rows.push({
-      name,
-      cat,
-      date,
-      time: isNaN(numTime) ? null : numTime,
-      timeRaw: rawTime
-    });
-  }
-
-  allResults = rows;
-  buildDateDropdown();
-  updateDonation();
-}
-
-// Uppdatera totalsumman (antal resultat × 50 kr)
-function updateDonation() {
-  const total = allResults.length * DONATION;
-  document.getElementById("donationBox").textContent = total + ":-";
-}
-
-// Bygg datum-dropdown automatiskt
-function buildDateDropdown() {
-  const sel = document.getElementById("dateSelect");
-  sel.innerHTML = "";
-
-  const dates = Array.from(new Set(allResults.map(r => r.date))).sort();
-  dates.forEach(d => {
-    const opt = document.createElement("option");
-    opt.value = d;
-    opt.textContent = d;
-    sel.appendChild(opt);
+  document.addEventListener("DOMContentLoaded", () => {
+    fetch(CSV_URL)
+      .then(res => res.text())
+      .then(text => {
+        allResults = parseCsv(text);
+        updateDonation();
+        initDateSelect();
+      })
+      .catch(err => {
+        console.error("Fel vid hämtning av CSV:", err);
+      });
   });
 
-  sel.onchange = render;
+  // Läs in CSV: använder rubrikerna Namn / Tid (i sekunder) / Kategori / Datum
+  function parseCsv(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length <= 1) return [];
 
-  if (dates.length > 0) {
-    sel.value = dates[0];
-    render();
+    const firstLine = lines[0];
+    const delimiter =
+      firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",";
+
+    const headers = firstLine.split(delimiter);
+    const idxName = headers.indexOf("Namn");
+    const idxTime = headers.indexOf("Tid (i sekunder)");
+    const idxCat  = headers.indexOf("Kategori");
+    const idxDate = headers.indexOf("Datum");
+
+    if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
+      console.error("Hittar inte alla rubriker i CSV:", headers);
+      return [];
+    }
+
+    const results = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const cols = line.split(delimiter);
+
+      const name = (cols[idxName] || "").trim();
+      const timeStr = (cols[idxTime] || "").trim();
+      const cat = (cols[idxCat] || "").trim();
+      const date = (cols[idxDate] || "").trim();
+
+      if (!name || !cat || !date) continue;
+
+      const time = Number(timeStr.replace(",", "."));
+      results.push({ name, cat, date, time, timeStr });
+    }
+
+    return results;
   }
-}
 
-// Rendera topplistorna
-function render() {
-  const date = document.getElementById("dateSelect").value;
-  const filtered = allResults.filter(r => r.date === date);
+  function updateDonation() {
+    const total = allResults.length * DONATION_PER_RESULT;
+    document.getElementById("donationBox").textContent = total + ":-";
+  }
 
-  ["Dam", "Herr", "Ungdom"].forEach(cat => {
-    const tbody = document.getElementById(cat);
+  function initDateSelect() {
+    const select = document.getElementById("dateSelect");
+    select.innerHTML = "";
+
+    const dateSet = new Set(allResults.map(r => r.date));
+    const dates = Array.from(dateSet).sort();
+
+    dates.forEach(date => {
+      const opt = document.createElement("option");
+      opt.value = date;
+      opt.textContent = date;
+      select.appendChild(opt);
+    });
+
+    select.addEventListener("change", () => {
+      renderForDate(select.value);
+    });
+
+    if (dates.length > 0) {
+      select.value = dates[0];
+      renderForDate(dates[0]);
+    }
+  }
+
+  function renderForDate(date) {
+    const rowsForDate = allResults.filter(r => r.date === date);
+
+    fillCategory("Dam", "dam-body", rowsForDate);
+    fillCategory("Herr", "herr-body", rowsForDate);
+    fillCategory("Ungdom", "ungdom-body", rowsForDate);
+  }
+
+  function fillCategory(categoryName, tbodyId, rows) {
+    const tbody = document.getElementById(tbodyId);
     tbody.innerHTML = "";
 
-    let list = filtered.filter(r => r.cat === cat);
+    let list = rows.filter(r => r.cat === categoryName);
 
-    // sortera: snabbast tid först, rader utan tid sist
     list.sort((a, b) => {
-      if (a.time === null && b.time === null) return 0;
-      if (a.time === null) return 1;
-      if (b.time === null) return -1;
-      return a.time - b.time;
+      const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
+      const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
+      return aTime - bTime;
     });
 
     list = list.slice(0, 5);
@@ -275,18 +336,13 @@ function render() {
       const timeTd = document.createElement("td");
 
       nameTd.textContent = r.name;
-      timeTd.textContent = r.time !== null ? r.time : r.timeRaw;
+      timeTd.textContent = isNaN(r.time) ? r.timeStr : r.time;
 
       tr.appendChild(nameTd);
       tr.appendChild(timeTd);
       tbody.appendChild(tr);
     });
-  });
-}
-
-// Starta
-loadCSV();
-</script>
+  }
 </script>
 
 </body>
