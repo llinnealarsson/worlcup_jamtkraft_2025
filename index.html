@@ -28,51 +28,6 @@
       font-weight: bold;
     }
 
-    /* TOPP-STRUKTUR */
-    .top-area {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 40px;
-    }
-
-    .left-top {
-      flex: 1;
-    }
-
-    /* Jämtkraft-loggan */
-    .right-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
-
-    .logo-box-main {
-      width: 520px;
-      max-width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .logo-box-main img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* Nattvandring loggan bredvid texten */
-    .receiver-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 10px 0;
-    }
-
-    .receiver-logo {
-      max-height: 55px;
-      width: auto;
-    }
-
     .date-row {
       margin-bottom: 10px;
       font-size: 20px;
@@ -85,15 +40,63 @@
     }
 
     .small-text {
-      margin-top: 6px;
+      margin-top: 10px;
       font-size: 16px;
     }
 
-    /* RESULTATTAVELN */
+    /* ---------- LAYOUT ---------- */
+
+    /* Övre rad: vänster (donation) + höger (Jämtkraft) */
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+    }
+
+    .left-panel {
+      flex: 1;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .logo-box-main {
+      width: 520px;
+      max-width: 100%;
+    }
+
+    .logo-box-main img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Nattvandrar-logga bredvid texten */
+    .receiver-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .receiver-logo {
+      max-height: 55px;
+      width: auto;
+    }
+
+    /* Nedre rad: hela bredden, resultat */
+    .bottom-row {
+      margin-top: 40px;
+    }
+
     .tables-area {
       display: flex;
       gap: 20px;
-      margin-top: 10px;
     }
 
     .cat-box {
@@ -103,7 +106,7 @@
       border-radius: 16px;
       color: white;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      min-width: 200px;
+      min-width: 220px;
     }
 
     .cat-title {
@@ -137,25 +140,31 @@
     }
 
     @media (max-width: 900px) {
-      .top-area {
+      body {
+        padding: 16px;
+      }
+
+      .top-row {
         flex-direction: column;
       }
-      .right-area {
-        align-items: center;
+
+      .right-panel {
+        justify-content: center;
       }
-      .tables-area {
+
+      .bottom-row .tables-area {
         flex-direction: column;
-        width: 100%;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="top-area">
+<!-- ÖVRE DEL: vit + lila rektangel -->
+<div class="top-row">
 
-  <!-- VÄNSTER DELEN -->
-  <div class="left-top">
+  <!-- Vänster: datum + donation + nattvandrarnas logga -->
+  <div class="left-panel">
     <div class="date-row">
       <label for="dateSelect"><b>Datum:</b></label>
       <select id="dateSelect"></select>
@@ -169,113 +178,124 @@
       <img class="receiver-logo" src="nattvandring.png" alt="Nattvandring">
     </div>
 
-    <div class="small-text">50 kr doneras för varje genomfört resultat.</div>
+    <div class="small-text">
+      50 kr doneras för varje genomfört resultat.
+    </div>
   </div>
 
-  <!-- HÖGER DELEN (LOGGA + RESULTAT) -->
-  <div class="right-area">
-
+  <!-- Höger: Jämtkraft-logga -->
+  <div class="right-panel">
     <div class="logo-box-main">
       <img src="jamtkraft_primar.png" alt="Jämtkraft">
     </div>
+  </div>
 
-    <div class="tables-area">
-      <div class="cat-box">
-        <div class="cat-title">Dam</div>
-        <table>
-          <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
-          <tbody id="dam-body"></tbody>
-        </table>
-      </div>
+</div>
 
-      <div class="cat-box">
-        <div class="cat-title">Herr</div>
-        <table>
-          <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
-          <tbody id="herr-body"></tbody>
-        </table>
-      </div>
-
-      <div class="cat-box">
-        <div class="cat-title">Ungdom</div>
-        <table>
-          <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
-          <tbody id="ungdom-body"></tbody>
-        </table>
-      </div>
+<!-- NEDRE DEL: hela gröna rektangeln (resultat) -->
+<div class="bottom-row">
+  <div class="tables-area">
+    <div class="cat-box">
+      <div class="cat-title">Dam</div>
+      <table>
+        <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
+        <tbody id="dam-body"></tbody>
+      </table>
     </div>
 
+    <div class="cat-box">
+      <div class="cat-title">Herr</div>
+      <table>
+        <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
+        <tbody id="herr-body"></tbody>
+      </table>
+    </div>
+
+    <div class="cat-box">
+      <div class="cat-title">Ungdom</div>
+      <table>
+        <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
+        <tbody id="ungdom-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <script>
+  // Länk till publicerad Rådata-CSV
   const CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
   const DONATION_PER_RESULT = 50;
+  const REFRESH_MS = 5000;
+
   let allResults = [];
+  let selectedDate = null;
 
-  document.addEventListener("DOMContentLoaded", loadCSV);
+  document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+    setInterval(loadData, REFRESH_MS);
+  });
 
-  function loadCSV() {
+  function loadData() {
     fetch(CSV_URL)
-      .then(r => r.text())
+      .then(res => res.text())
       .then(text => {
-        const newResults = parseCsv(text);
-
-        if (newResults.length !== allResults.length) {
-          allResults = newResults;
-          updateDonation();
-          initDateSelect();
-        }
-      });
-
-    setTimeout(loadCSV, 5000);
+        allResults = parseCsv(text);
+        updateDonation();
+        updateDateSelect();
+      })
+      .catch(err => console.error("Fel vid hämtning av CSV:", err));
   }
 
+  // Parsar CSV med rubriker: Namn / Tid (i sekunder) / Kategori / Datum
   function parseCsv(text) {
     const lines = text.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
 
-    const delim = lines[0].includes(";") ? ";" : ",";
-    const header = lines[0].split(delim);
+    const headerLine = lines[0];
+    const delim = headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
+    const headers = headerLine.split(delim);
 
-    const idxName = header.indexOf("Namn");
-    const idxTime = header.indexOf("Tid (i sekunder)");
-    const idxCat = header.indexOf("Kategori");
-    const idxDate = header.indexOf("Datum");
+    const idxName = headers.indexOf("Namn");
+    const idxTime = headers.indexOf("Tid (i sekunder)");
+    const idxCat  = headers.indexOf("Kategori");
+    const idxDate = headers.indexOf("Datum");
 
-    const arr = [];
+    const results = [];
 
     for (let i = 1; i < lines.length; i++) {
-      const c = lines[i].split(delim);
-      const name = c[idxName];
-      const timeStr = c[idxTime];
-      const cat = c[idxCat];
-      const date = c[idxDate];
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const cols = line.split(delim);
+      const name = (cols[idxName] || "").trim();
+      const timeStr = (cols[idxTime] || "").trim();
+      const cat = (cols[idxCat] || "").trim();
+      const date = (cols[idxDate] || "").trim();
+
       if (!name || !date) continue;
 
-      arr.push({
-        name,
-        cat,
-        date,
-        time: Number(timeStr.replace(",", ".")),
-        timeStr
-      });
+      const time = Number(timeStr.replace(",", "."));
+      results.push({ name, cat, date, time, timeStr });
     }
-    return arr;
+
+    return results;
   }
 
   function updateDonation() {
-    document.getElementById("donationBox").textContent =
-      allResults.length * DONATION_PER_RESULT + ":-";
+    const total = allResults.length * DONATION_PER_RESULT;
+    document.getElementById("donationBox").textContent = total + ":-";
   }
 
-  function initDateSelect() {
+  function updateDateSelect() {
     const sel = document.getElementById("dateSelect");
-    sel.innerHTML = "";
 
     const dates = [...new Set(allResults.map(r => r.date))].sort();
+    const previous = selectedDate || sel.value || null;
+
+    sel.innerHTML = "";
+
     dates.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d;
@@ -283,35 +303,72 @@
       sel.appendChild(opt);
     });
 
-    sel.onchange = () => render(sel.value);
-    if (dates.length) {
-      sel.value = dates[0];
-      render(dates[0]);
+    if (dates.length === 0) {
+      selectedDate = null;
+      clearTables();
+      return;
     }
+
+    if (previous && dates.includes(previous)) {
+      selectedDate = previous;
+    } else {
+      selectedDate = dates[0];
+    }
+
+    sel.value = selectedDate;
+    renderForDate(selectedDate);
+
+    sel.onchange = () => {
+      selectedDate = sel.value;
+      renderForDate(selectedDate);
+    };
   }
 
-  function render(date) {
-    const rows = allResults.filter(r => r.date === date);
-    fill("Dam", "dam-body", rows);
-    fill("Herr", "herr-body", rows);
-    fill("Ungdom", "ungdom-body", rows);
+  function clearTables() {
+    ["dam-body", "herr-body", "ungdom-body"].forEach(id => {
+      document.getElementById(id).innerHTML =
+        `<tr><td colspan="2">Inga resultat</td></tr>`;
+    });
   }
 
-  function fill(cat, id, rows) {
-    const tb = document.getElementById(id);
-    tb.innerHTML = "";
+  function renderForDate(date) {
+    const rowsForDate = allResults.filter(r => r.date === date);
 
-    let list = rows.filter(r => r.cat === cat);
-    list.sort((a,b) => (isNaN(a.time)?1:a.time) - (isNaN(b.time)?1:b.time));
-    list = list.slice(0,5);
+    fillCategory("Dam", "dam-body", rowsForDate);
+    fillCategory("Herr", "herr-body", rowsForDate);
+    fillCategory("Ungdom", "ungdom-body", rowsForDate);
+  }
+
+  function fillCategory(categoryName, tbodyId, rows) {
+    const tbody = document.getElementById(tbodyId);
+    tbody.innerHTML = "";
+
+    let list = rows.filter(r => r.cat === categoryName);
+
+    list.sort((a, b) => {
+      const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
+      const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
+      return aTime - bTime;
+    });
+
+    list = list.slice(0, 5);
 
     if (!list.length) {
-      tb.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
       return;
     }
 
     list.forEach(r => {
-      tb.innerHTML += `<tr><td>${r.name}</td><td>${isNaN(r.time)?r.timeStr:r.time}</td></tr>`;
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td");
+      const tdTime = document.createElement("td");
+
+      tdName.textContent = r.name;
+      tdTime.textContent = isNaN(r.time) ? r.timeStr : r.time;
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdTime);
+      tbody.appendChild(tr);
     });
   }
 </script>
