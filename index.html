@@ -5,35 +5,25 @@
   <title>Jämtkraft World Cup 2025 - Resultat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      background: #fff9cc;
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      margin: 0;
-    }
+h1, .receiver {
+  font-size: 52px;     /* samma storlek för båda rubrikerna */
+  font-weight: bold;
+  margin: 0 0 10px 0;
+}
 
-    h1 {
-      font-size: 52px;     /* större rubrik */
-      margin: 0 0 10px 0;
-    }
+#donationBox {
+  font-size: 80px;     /* summan är fortfarande större */
+  font-weight: bold;
+  color: #ff9900;
+  line-height: 1;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
 
-    #donationBox {
-      font-size: 80px;     /* större summa */
-      font-weight: bold;
-      color: #ff9900;
-      line-height: 1;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    .receiver {
-      font-size: 36px;     /* större text "till Nattvandring" */
-      font-weight: bold;
-    }
 
     .date-row {
-      margin-bottom: 10px;
-      font-size: 20px;
+      margin-bottom: 8px;
+      font-size: 15px;
     }
 
     select {
@@ -292,39 +282,45 @@
   }
 
   function updateDateSelect() {
-    const sel = document.getElementById("dateSelect");
+  const sel = document.getElementById("dateSelect");
+  const dates = [...new Set(allResults.map(r => r.date))].sort();
 
-    const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const previous = selectedDate || sel.value || null;
+  if (dates.length === 0) {
+    clearTables();
+    return;
+  }
 
+  // Kolla om listan redan är samma → bygg inte om i onödan
+  const currentOptions = Array.from(sel.options).map(o => o.value);
+  const sameList = dates.length === currentOptions.length &&
+                   dates.every((d, i) => d === currentOptions[i]);
+
+  if (!sameList) {
     sel.innerHTML = "";
-
     dates.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d;
       opt.textContent = d;
       sel.appendChild(opt);
     });
+  }
 
-    if (dates.length === 0) {
-      selectedDate = null;
-      clearTables();
-      return;
-    }
-
-    if (previous && dates.includes(previous)) {
-      selectedDate = previous;
-    } else {
-      selectedDate = dates[0];
-    }
-
+  // Behåll tidigare val om det finns
+  if (selectedDate && dates.includes(selectedDate)) {
     sel.value = selectedDate;
-    renderForDate(selectedDate);
+  } else {
+    selectedDate = dates[0];
+    sel.value = selectedDate;
+  }
 
-    sel.onchange = () => {
-      selectedDate = sel.value;
-      renderForDate(selectedDate);
-    };
+  renderForDate(selectedDate);
+
+  sel.onchange = () => {
+    selectedDate = sel.value;
+    renderForDate(selectedDate);
+  };
+}
+
   }
 
   function clearTables() {
