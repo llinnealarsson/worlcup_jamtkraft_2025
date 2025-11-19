@@ -32,7 +32,7 @@
     .top-area {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 30px;
     }
 
@@ -58,6 +58,14 @@
       border-radius: 0;
       box-shadow: none;        /* ingen skugga */
     }
+
+    .right-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end; /* logga + tabeller högerjusterade */
+    }
+    
 
     .logo-box-main img {
       max-width: 100%;
@@ -157,6 +165,7 @@
 <body>
 
 <div class="top-area">
+  <!-- VÄNSTER: text + nattvandrarnas logga -->
   <div class="left-top">
     <div class="date-row">
       <label for="dateSelect"><b>Datum:</b></label>
@@ -166,7 +175,6 @@
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
 
-    <!-- Text + nattvandrar-logo bredvid varandra -->
     <div class="receiver-row">
       <div class="receiver">
         till Nattvandring
@@ -179,22 +187,45 @@
     </div>
   </div>
 
-  <div class="logo-area">
+  <!-- HÖGER: Jämtkraft-logga + resultat under -->
+  <div class="right-area">
     <div class="logo-box-main">
       <img src="jamtkraft_primar.png" alt="Jämtkraft">
     </div>
-  </div>
 
-<div class="tables-area">
-  <div class="cat-box">
-    <div class="cat-title">Dam</div>
-    <table>
-      <thead>
-        <tr><th>Namn</th><th>Tid (s)</th></tr>
-      </thead>
-      <tbody id="dam-body"></tbody>
-    </table>
+    <div class="tables-area">
+      <div class="cat-box">
+        <div class="cat-title">Dam</div>
+        <table>
+          <thead>
+            <tr><th>Namn</th><th>Tid (s)</th></tr>
+          </thead>
+          <tbody id="dam-body"></tbody>
+        </table>
+      </div>
+
+      <div class="cat-box">
+        <div class="cat-title">Herr</div>
+        <table>
+          <thead>
+            <tr><th>Namn</th><th>Tid (s)</th></tr>
+          </thead>
+          <tbody id="herr-body"></tbody>
+        </table>
+      </div>
+
+      <div class="cat-box">
+        <div class="cat-title">Ungdom</div>
+        <table>
+          <thead>
+            <tr><th>Namn</th><th>Tid (s)</th></tr>
+          </thead>
+          <tbody id="ungdom-body"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
+</div>
 
   <div class="cat-box">
     <div class="cat-title">Herr</div>
@@ -356,11 +387,31 @@
     });
   }
 
-  // Starta första laddningen
-loadCSV();
+function loadCSV() {
+  fetch(CSV_URL)
+    .then(res => res.text())
+    .then(text => {
+      const newResults = parseCsv(text);
 
-// Kör automatiskt var 5:e sekund
-setInterval(loadCSV, 5000);
+      // Om det kommit fler resultat än tidigare → ladda om sidan
+      if (newResults.length > allResults.length) {
+        location.reload();
+      }
+
+      allResults = newResults;
+      updateDonation();
+      initDateSelect();
+    })
+    .catch(err => {
+      console.error("Fel vid hämtning av CSV:", err);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadCSV(); // första laddningen
+  setInterval(loadCSV, 5000); // kolla var 5:e sekund
+});
+
 </script>
 
 </body>
