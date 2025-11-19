@@ -355,6 +355,12 @@
       tbody.appendChild(tr);
     });
   }
+
+  // Starta första laddningen
+loadCSV();
+
+// Kör automatiskt var 5:e sekund
+setInterval(loadCSV, 5000);
 </script>
 
 </body>
