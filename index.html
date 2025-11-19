@@ -226,13 +226,13 @@
   const REFRESH_MS = 5000;
 
   let allResults = [];
-  let selectedDate = null;      // globalt valt datum
-  let dateSelectEl = null;      // referens till select-elementet
+  let selectedDate = null;
+  let dateSelectEl = null;
 
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
 
-    // Sätt onchange EN gång här
+    // Sätt onchange EN gång
     dateSelectEl.addEventListener("change", () => {
       selectedDate = dateSelectEl.value;
       renderForDate(selectedDate);
@@ -246,13 +246,36 @@
     fetch(CSV_URL)
       .then(res => res.text())
       .then(text => {
-        allResults = parseCsv(text);
+        const parsed = parseCsv(text);
+
+        // ⬇️ NYTT: slå ihop gamla + nya, ta bara med NYA rader
+        allResults = mergeResults(allResults, parsed);
+
         updateDonation();
         updateDateSelect();
       })
       .catch(err => console.error("Fel vid hämtning av CSV:", err));
   }
 
+  // Slår ihop listor, där nyckeln är (name|cat|date|timeStr)
+  function mergeResults(oldList, newList) {
+    const existingKeys = new Set(
+      oldList.map(r => r.name + "|" + r.cat + "|" + r.date + "|" + r.timeStr)
+    );
+
+    const merged = oldList.slice();
+
+    newList.forEach(r => {
+      const key = r.name + "|" + r.cat + "|" + r.date + "|" + r.timeStr;
+      if (!existingKeys.has(key)) {
+        merged.push(r);
+      }
+    });
+
+    return merged;
+  }
+
+  // Parsar CSV med rubriker: Namn / Tid (i sekunder) / Kategori / Datum
   function parseCsv(text) {
     const lines = text.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
@@ -296,7 +319,7 @@
     const sel = dateSelectEl;
 
     const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const previous = selectedDate;   // <-- ändrat: vi litar på globalt vald dag
+    const previous = selectedDate;   // 👈 viktigt: titta bara på vårt minne
 
     sel.innerHTML = "";
 
@@ -314,11 +337,11 @@
     }
 
     if (previous && dates.includes(previous)) {
-      // Behåll användarens val om datumet fortfarande finns
+      // Behåll användarens val om det finns kvar
       selectedDate = previous;
     } else {
-      // Annars välj SENASTE datumet
-      selectedDate = dates[dates.length - 1];   // <-- ändrat från dates[0]
+      // Annars: välj SENASTE datumet
+      selectedDate = dates[dates.length - 1];
     }
 
     sel.value = selectedDate;
@@ -373,6 +396,3 @@
     });
   }
 </script>
-
-</body>
-</html>
