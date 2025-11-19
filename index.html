@@ -142,6 +142,7 @@ select {
 </div>
 
 <script>
+<script>
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/1tAOi5eIdDWxUh5AkWQa-q9j4yD10QjAwi1Hcg5k9tyI/export?format=csv&gid=851007371";
 
@@ -153,69 +154,58 @@ async function loadCSV() {
   try {
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    console.log("CSV hämtad, längd:", text.length);
     parseCSV(text);
   } catch (e) {
     console.error("Fel vid hämtning av CSV:", e);
   }
 }
 
-// Parsa CSV och plocka ut Namn / Tid / Kategori / Datum
+// Parsa CSV via rubrikerna: Namn, Tid (i sekunder), Kategori, Datum
 function parseCSV(csv) {
   const lines = csv.trim().split(/\r?\n/);
-  const rows = [];
-  if (lines.length < 2) {
-    console.warn("CSV verkar tom");
-    return;
-  }
+  if (lines.length < 2) return;
 
   // lista ut om det är ; eller , som avgränsare
-  const header = lines[0];
+  const headerLine = lines[0];
   const delimiter =
-    header.includes(";") && !header.includes(",") ? ";" : ",";
+    headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
 
-  const headerCols = header.split(delimiter);
-  console.log("Header-kolumner:", headerCols, "Delimiter:", delimiter);
+  const headerCols = headerLine.split(delimiter);
 
-  // hitta index baserat på rubriknamn
   const idxName = headerCols.indexOf("Namn");
   const idxTime = headerCols.indexOf("Tid (i sekunder)");
   const idxCat  = headerCols.indexOf("Kategori");
   const idxDate = headerCols.indexOf("Datum");
 
   if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
-    console.error("Hittar inte alla rubriker i CSV:", headerCols);
+    console.error("Rubriker hittades inte:", headerCols);
     return;
   }
 
+  const rows = [];
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
 
-    const c = line.split(delimiter);
+    const cols = line.split(delimiter);
 
-    const name    = (c[idxName] || "").trim();
-    const rawTime = (c[idxTime] || "").trim();
-    const cat     = (c[idxCat]  || "").trim();
-    const date    = (c[idxDate] || "").trim();
+    const name    = (cols[idxName] || "").trim();
+    const rawTime = (cols[idxTime] || "").trim();
+    const cat     = (cols[idxCat]  || "").trim();
+    const date    = (cols[idxDate] || "").trim();
 
-    let timeNumber = Number(rawTime.replace(",", "."));
-    if (isNaN(timeNumber)) {
-      timeNumber = null; // vi kastar inte raden pga detta
-    }
+    if (!name || !date) continue;
 
-    if (!name || !date) continue; // bara krav: namn + datum
-
+    const numTime = Number(rawTime.replace(",", "."));
     rows.push({
       name,
-      time: timeNumber,
-      timeRaw: rawTime,
       cat,
-      date
+      date,
+      time: isNaN(numTime) ? null : numTime,
+      timeRaw: rawTime
     });
   }
 
-  console.log("Antal rader efter parsning:", rows.length);
   allResults = rows;
   buildDateDropdown();
   updateDonation();
@@ -232,16 +222,16 @@ function buildDateDropdown() {
   const sel = document.getElementById("dateSelect");
   sel.innerHTML = "";
 
-  const dates = [...new Set(allResults.map(r => r.date))].sort();
-
+  const dates = Array.from(new Set(allResults.map(r => r.date))).sort();
   dates.forEach(d => {
     const opt = document.createElement("option");
-    opt.textContent = d;
     opt.value = d;
+    opt.textContent = d;
     sel.appendChild(opt);
   });
 
   sel.onchange = render;
+
   if (dates.length > 0) {
     sel.value = dates[0];
     render();
@@ -253,36 +243,42 @@ function render() {
   const date = document.getElementById("dateSelect").value;
   const filtered = allResults.filter(r => r.date === date);
 
-  ["Dam","Herr","Ungdom"].forEach(cat => {
+  ["Dam", "Herr", "Ungdom"].forEach(cat => {
     const tbody = document.getElementById(cat);
     tbody.innerHTML = "";
 
-    // filtrera på kategori
     let list = filtered.filter(r => r.cat === cat);
 
-    // sortera efter tid om vi har den, annars lägg de utan tid sist
-    list = list.sort((a, b) => {
+    // sortera: snabbast tid först, rader utan tid sist
+    list.sort((a, b) => {
       if (a.time === null && b.time === null) return 0;
       if (a.time === null) return 1;
       if (b.time === null) return -1;
-      return a.time - b.time; // snabbast först
-    }).slice(0, 5);
+      return a.time - b.time;
+    });
+
+    list = list.slice(0, 5);
 
     if (list.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 2;
+      td.textContent = "Inga resultat";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
 
     list.forEach(r => {
       const tr = document.createElement("tr");
-      const tdName = document.createElement("td");
-      const tdTime = document.createElement("td");
+      const nameTd = document.createElement("td");
+      const timeTd = document.createElement("td");
 
-      tdName.textContent = r.name;
-      tdTime.textContent = r.time !== null ? r.time : r.timeRaw;
+      nameTd.textContent = r.name;
+      timeTd.textContent = r.time !== null ? r.time : r.timeRaw;
 
-      tr.appendChild(tdName);
-      tr.appendChild(tdTime);
+      tr.appendChild(nameTd);
+      tr.appendChild(timeTd);
       tbody.appendChild(tr);
     });
   });
@@ -290,6 +286,7 @@ function render() {
 
 // Starta
 loadCSV();
+</script>
 </script>
 
 </body>
