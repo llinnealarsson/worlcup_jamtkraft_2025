@@ -47,6 +47,13 @@
       margin-left: 8px;
     }
 
+    /* Datum absolut högst upp i vänstra hörnet */
+    .absolute-date {
+      position: absolute;
+      top: 10px;   /* justera vid behov */
+      left: 20px;  /* justera vid behov */
+      z-index: 1000;
+    }
 
     /* ---------- LAYOUT ---------- */
 
@@ -60,7 +67,7 @@
 
     .left-panel {
       flex: 1;
-      margin-top: 100px;   /* <-- lägg till denna */
+      margin-top: 100px;
     }
 
     .right-panel {
@@ -69,7 +76,6 @@
       justify-content: flex-end;
       align-items: center;
       margin-top: 100px; /* flyttar ner loggan */
-
     }
 
     .logo-box-main {
@@ -168,15 +174,17 @@
 </head>
 <body>
 
+<!-- DATUM – separat, absolut längst upp till vänster -->
+<div class="date-row absolute-date">
+  <label for="dateSelect"><b>Datum:</b></label>
+  <select id="dateSelect"></select>
+</div>
+
 <!-- ÖVRE DEL: vit + lila rektangel -->
 <div class="top-row">
 
-  <!-- Vänster: datum + donation + nattvandrarnas logga -->
+  <!-- Vänster: donation + nattvandrarnas logga -->
   <div class="left-panel">
-    <div class="date-row">
-      <label for="dateSelect"><b>Datum:</b></label>
-      <select id="dateSelect"></select>
-    </div>
 
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
