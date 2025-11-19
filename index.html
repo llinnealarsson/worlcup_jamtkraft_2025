@@ -40,34 +40,44 @@
       flex: 1;
     }
 
-    .logo-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .logo-box-main {
-      width: 420px;
-      max-width: 100%;
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
+        .logo-area {
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
+
+    /* Jämtkraft-loggan – stor, utan vit ruta */
+    .logo-box-main {
+      max-width: 520px;        /* gör större om du vill */
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent; /* ingen vit bakgrund */
+      padding: 0;              /* ingen padding runt */
+      border-radius: 0;
+      box-shadow: none;        /* ingen skugga */
     }
 
     .logo-box-main img {
       max-width: 100%;
       height: auto;
+      display: block;
     }
 
-    .logo-box-small img {
-      max-width: 160px;
-      height: auto;
+    /* Rad med text + nattvandrar-logo */
+    .receiver-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
     }
+
+    .receiver-logo {
+      max-height: 60px;   /* justera storlek här */
+      width: auto;
+    }
+    
 
     .date-row {
       margin-bottom: 10px;
@@ -155,9 +165,15 @@
 
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
-    <div class="receiver">
-      till Nattvandring
+
+    <!-- Text + nattvandrar-logo bredvid varandra -->
+    <div class="receiver-row">
+      <div class="receiver">
+        till Nattvandring
+      </div>
+      <img class="receiver-logo" src="nattvandring.png" alt="Nattvandring">
     </div>
+
     <div class="small-text">
       50 kr doneras för varje genomfört resultat.
     </div>
@@ -167,11 +183,7 @@
     <div class="logo-box-main">
       <img src="jamtkraft_primar.png" alt="Jämtkraft">
     </div>
-    <div class="logo-box-small">
-      <img src="nattvandring.png" alt="Nattvandring">
-    </div>
   </div>
-</div>
 
 <div class="tables-area">
   <div class="cat-box">
