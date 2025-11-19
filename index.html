@@ -254,9 +254,18 @@
     fetch(CSV_URL)
       .then(res => res.text())
       .then(text => {
-        allResults = parseCsv(text);
-        updateDonation();
-        updateDateSelect();
+        const newResults = parseCsv(text);
+
+        // Endast om datan faktiskt ändrats
+        if (JSON.stringify(newResults) !== JSON.stringify(allResults)) {
+          allResults = newResults;
+          updateDonation();
+          updateDateSelect();
+        } else {
+          // Om datan är samma, uppdatera bara donation och tabeller
+          updateDonation();
+          if (selectedDate) renderForDate(selectedDate);
+        }
       })
       .catch(err => console.error("Fel vid hämtning av CSV:", err));
   }
@@ -303,18 +312,7 @@
 
   function updateDateSelect() {
     const sel = document.getElementById("dateSelect");
-
     const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const previous = selectedDate || sel.value || null;
-
-    sel.innerHTML = "";
-
-    dates.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d;
-      opt.textContent = d;
-      sel.appendChild(opt);
-    });
 
     if (dates.length === 0) {
       selectedDate = null;
@@ -322,13 +320,29 @@
       return;
     }
 
-    if (previous && dates.includes(previous)) {
-      selectedDate = previous;
-    } else {
-      selectedDate = dates[0];
+    // Bygg bara om options om listan ändrats
+    const currentOptions = Array.from(sel.options).map(o => o.value);
+    const same = dates.length === currentOptions.length &&
+                 dates.every((d,i) => d === currentOptions[i]);
+
+    if (!same) {
+      sel.innerHTML = "";
+      dates.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        sel.appendChild(opt);
+      });
     }
 
-    sel.value = selectedDate;
+    // Behåll tidigare valt datum om möjligt
+    if (selectedDate && dates.includes(selectedDate)) {
+      sel.value = selectedDate;
+    } else {
+      selectedDate = dates[0];
+      sel.value = selectedDate;
+    }
+
     renderForDate(selectedDate);
 
     sel.onchange = () => {
@@ -385,9 +399,6 @@
     });
   }
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
