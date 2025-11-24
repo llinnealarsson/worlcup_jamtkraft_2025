@@ -166,7 +166,7 @@
 </head>
 <body>
 
-<!-- DATUM – separat, absolut längst upp till vänster -->
+<!-- DATUM – absolut längst upp till vänster -->
 <div class="date-row absolute-date">
   <label for="dateSelect"><b>Datum:</b></label>
   <select id="dateSelect"></select>
@@ -219,11 +219,12 @@
 </div>
 
 <script>
+  // CSV från publicerat Google Sheet (Rådata / Formulärsvar)
   const CSV_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
-  const DONATION_PER_RESULT = 50;
-  const REFRESH_MS = 5000;
+  const DONATION_PER_RESULT = 50;   // 50 kr per rad
+  const REFRESH_MS = 5000;          // uppdatera var 5:e sekund
 
   let allResults = [];
   let selectedDate = null;
@@ -232,7 +233,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
 
-    // Sätt onchange EN gång
     dateSelectEl.addEventListener("change", () => {
       selectedDate = dateSelectEl.value;
       renderForDate(selectedDate);
@@ -242,52 +242,54 @@
     setInterval(loadData, REFRESH_MS);
   });
 
+  // Hämtar CSV från Google Sheets (utan cache)
   function loadData() {
-    fetch(CSV_URL)
-      .then(res => res.text())
+    fetch(CSV_URL + "&t=" + Date.now(), { cache: "no-store" })
+      .then(res => {
+        if (!res.ok) throw new Error("HTTP-fel: " + res.status);
+        return res.text();
+      })
       .then(text => {
         const parsed = parseCsv(text);
 
-        // ⬇️ NYTT: slå ihop gamla + nya, ta bara med NYA rader
-        allResults = mergeResults(allResults, parsed);
+        // VIKTIGT: ersätt hela listan – då försvinner borttagna rader
+        allResults = parsed;
 
         updateDonation();
         updateDateSelect();
       })
-      .catch(err => console.error("Fel vid hämtning av CSV:", err));
+      .catch(err => {
+        console.error("Fel vid hämtning av CSV:", err);
+        // vid fel: visa "Inga resultat" så man ser att något är knas
+        clearTables();
+        document.getElementById("donationBox").textContent = "0:-";
+      });
   }
 
-  // Slår ihop listor, där nyckeln är (name|cat|date|timeStr)
-  function mergeResults(oldList, newList) {
-    const existingKeys = new Set(
-      oldList.map(r => r.name + "|" + r.cat + "|" + r.date + "|" + r.timeStr)
-    );
-
-    const merged = oldList.slice();
-
-    newList.forEach(r => {
-      const key = r.name + "|" + r.cat + "|" + r.date + "|" + r.timeStr;
-      if (!existingKeys.has(key)) {
-        merged.push(r);
-      }
-    });
-
-    return merged;
-  }
-
-  // Parsar CSV med rubriker: Namn / Tid (i sekunder) / Kategori / Datum
+  // Parsar CSV: Tidsstämpel / Namn / Tid / Kategori / Datum
   function parseCsv(text) {
     const lines = text.trim().split(/\r?\n/);
     if (lines.length < 2) return [];
 
-    const headerLine = lines[0];
-    const delim = headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
-    const headers = headerLine.split(delim);
+    // ta bort ev. BOM-tecken
+    let headerLine = lines[0].replace(/^\uFEFF/, "");
+    const delim =
+      headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
+    const headers = headerLine.split(delim).map(h => h.trim());
 
-    const idxName = headers.indexOf("Namn");
-    const idxTime = headers.indexOf("Tid (i sekunder)");
-    const idxCat  = headers.indexOf("Kategori");
-    const idxDate = headers.indexOf("Datum");
+    // hitta kolumnindex (tillåt både "Tid" och "Tid (i sekunder)")
+    const idxName = headers.findIndex(h => h.toLowerCase() === "namn");
+    const idxTime = headers.findIndex(h => {
+      const low = h.toLowerCase();
+      return low === "tid" || low === "tid (i sekunder)";
+    });
+    const idxCat  = headers.findIndex(h => h.toLowerCase() === "kategori");
+    const idxDate = headers.findIndex(h => h.toLowerCase() === "datum");
+
+    if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
+      console.error("Hittar inte alla nödvändiga kolumner i CSV:", headers);
+      return [];
+    }
 
     const results = [];
 
@@ -301,25 +303,29 @@
       const cat = (cols[idxCat] || "").trim();
       const date = (cols[idxDate] || "").trim();
 
-      if (!name || !date) continue;
+      if (!name || !date || !cat) continue;
 
-      const time = Number(timeStr.replace(",", "."));
+      let time = Number(timeStr.replace(",", "."));
+      if (!isFinite(time)) time = NaN;
+
       results.push({ name, cat, date, time, timeStr });
     }
 
     return results;
   }
 
+  // Donation = 50 kr per resultat (alla dagar)
   function updateDonation() {
     const total = allResults.length * DONATION_PER_RESULT;
     document.getElementById("donationBox").textContent = total + ":-";
   }
 
+  // Uppdaterar datumlistan + håller kvar användarens val om möjligt
   function updateDateSelect() {
     const sel = dateSelectEl;
 
     const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const previous = selectedDate;   // 👈 viktigt: titta bara på vårt minne
+    const previous = selectedDate;
 
     sel.innerHTML = "";
 
@@ -337,10 +343,9 @@
     }
 
     if (previous && dates.includes(previous)) {
-      // Behåll användarens val om det finns kvar
       selectedDate = previous;
     } else {
-      // Annars: välj SENASTE datumet
+      // välj senaste datumet
       selectedDate = dates[dates.length - 1];
     }
 
@@ -355,6 +360,7 @@
     });
   }
 
+  // Fyll tabellerna för valt datum
   function renderForDate(date) {
     const rowsForDate = allResults.filter(r => r.date === date);
 
@@ -369,13 +375,14 @@
 
     let list = rows.filter(r => r.cat === categoryName);
 
+    // snabbast tid först (lägst antal sekunder)
     list.sort((a, b) => {
       const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
       const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
       return aTime - bTime;
     });
 
-    list = list.slice(0, 5);
+    list = list.slice(0, 5); // topp 5
 
     if (!list.length) {
       tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
@@ -396,3 +403,7 @@
     });
   }
 </script>
+
+</body>
+</html>
+
