@@ -95,11 +95,11 @@
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
   const DONATION_PER_RESULT = 50;
-  const REFRESH_MS = 10000; // 10 sekunder
-  const STABLE_REQUIRED = 2;
+  const REFRESH_MS = 10000; // 10 sekunder — ändra till 3000 om du vill snabbare
+  const STABLE_REQUIRED = 2; // kräver att kandidat syns i N polls i rad för att accepteras
 
   // stabil polling
-  let prevSerialized = "";      // accepterad representation (JSON string of rows)
+  let prevSerialized = "";      // accepterad representation (JSON string av nycklar)
   let candidateSerialized = "";
   let candidateCount = 0;
 
