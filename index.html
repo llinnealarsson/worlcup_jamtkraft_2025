@@ -214,57 +214,73 @@
     return cols;
   }
 
-  function parseCsv(text) {
-    const lines = text.split(/\r?\n/).filter(Boolean);
-    if (lines.length < 1) return [];
+function parseCsv(text) {
+  const lines = text.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 1) return [];
 
-    // header
-    let headerLine = lines[0].replace(/^\uFEFF/, "").trim();
-    const delim = (headerLine.includes(";") && !headerLine.includes(",")) ? ";" : ",";
-    const rawHeaders = headerLine.split(delim).map(h => h.trim());
-    const headers = rawHeaders.map(h => h.toLowerCase());
+  // header
+  let headerLine = lines[0].replace(/^\uFEFF/, "").trim();
+  const delim = (headerLine.includes(";") && !headerLine.includes(",")) ? ";" : ",";
+  const rawHeaders = headerLine.split(delim).map(h => h.trim());
+  const headers = rawHeaders.map(h => h.toLowerCase());
 
-    // identifiera kolumner (tolerant)
-    const idxName = headers.findIndex(h => h === "namn" || h === "name");
-    const idxTime = headers.findIndex(h => h.includes("tid") || h.includes("time") || h.includes("sekunder"));
-    const idxCat  = headers.findIndex(h => h === "kategori" || h === "category");
-    const idxDate = headers.findIndex(h => h === "datum" || h === "date");
-    const idxTs   = headers.findIndex(h => h.includes("timestamp") || h.includes("tids") || h.includes("tidsstämpel") || h.includes("time stamp"));
+  // Hitta tidsstämpel-kolumn (ska prioriteras)
+  const idxTs = headers.findIndex(h =>
+    h.includes("timestamp") ||
+    h.includes("tidstämpel") ||
+    h.includes("tid-stämpel") ||
+    h.includes("time stamp") ||
+    h === "tidst\u00e4mpel" // säkerhetsfall
+  );
 
-    if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
-      console.error("Hittar inte alla nödvändiga kolumner i CSV. Headers:", rawHeaders);
-      return [];
-    }
+  // Hitta namn, kategori, datum som tidigare
+  const idxName = headers.findIndex(h => h === "namn" || h === "name");
+  const idxCat  = headers.findIndex(h => h === "kategori" || h === "category");
+  const idxDate = headers.findIndex(h => h === "datum" || h === "date");
 
-    const results = [];
-    for (let i = 1; i < lines.length; i++) {
-      const raw = lines[i];
-      if (!raw || !raw.trim()) continue;
-      const cols = splitCsvLine(raw, delim);
-      const name = (cols[idxName] || "").trim();
-      const timeStr = (cols[idxTime] || "").trim();
-      const cat = (cols[idxCat] || "").trim();
-      const date = (cols[idxDate] || "").trim();
-      const ts = (idxTs !== -1 ? (cols[idxTs] || "").trim() : "");
+  // Hitta tid-kolumn (säkra matchningar) - IGNORERA idxTs
+  const idxTime = headers.findIndex((h, i) => {
+    if (i === idxTs) return false; // ignorera tidsstämpel
+    // exakta/säkra mönster för att hitta tiden i sekunder
+    if (h === "tid" || h === "tid (i sekunder)" || h === "tid (s)" || h === "time (s)" || h === "time") return true;
+    if (h.includes("tid (i") || h.includes("sekunder") || h.match(/^tid\b/)) return true;
+    return false;
+  });
 
-      // ignorera ofullständiga rader (viktig för Forms)
-      if (!name || !date || !cat) continue;
-
-      const time = Number(timeStr.replace(",", "."));
-      const id = (ts && ts.length) ? ("TS:" + normalize(ts)) : ("FK:" + normalize(name) + "|" + normalize(cat) + "|" + normalize(date) + "|" + normalize(timeStr));
-
-      results.push({
-        id,
-        name,
-        cat,
-        date,
-        time: isFinite(time) ? time : NaN,
-        timeStr
-      });
-    }
-
-    return results;
+  if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
+    console.error("Hittar inte alla nödvändiga kolumner i CSV. Headers:", rawHeaders);
+    return [];
   }
+
+  const results = [];
+  for (let i = 1; i < lines.length; i++) {
+    const raw = lines[i];
+    if (!raw || !raw.trim()) continue;
+    const cols = splitCsvLine(raw, delim);
+
+    const name = (cols[idxName] || "").trim();
+    const timeStr = (cols[idxTime] || "").trim();
+    const cat = (cols[idxCat] || "").trim();
+    const date = (cols[idxDate] || "").trim();
+    const ts = (idxTs !== -1 ? (cols[idxTs] || "").trim() : "");
+
+    if (!name || !date || !cat) continue;
+
+    const time = Number(timeStr.replace(",", "."));
+    const id = (ts && ts.length) ? ("TS:" + normalize(ts)) : ("FK:" + normalize(name) + "|" + normalize(cat) + "|" + normalize(date) + "|" + normalize(timeStr));
+
+    results.push({
+      id,
+      name,
+      cat,
+      date,
+      time: isFinite(time) ? time : NaN,
+      timeStr
+    });
+  }
+
+  return results;
+}
 
   function normalize(s) {
     return String(s || "").replace(/\s+/g, " ").trim().replace(/,/g, ".");
