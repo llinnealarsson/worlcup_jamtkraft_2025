@@ -130,62 +130,71 @@
   });
 
   // --- Robust fetch + stabiliseringslogik ---
-  function fetchAndProcess() {
-    fetch(CSV_URL + "&t=" + Date.now(), { cache: "no-store" })
-      .then(res => {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.text();
-      })
-      .then(text => {
-        console.debug("Fetched CSV length:", text.length, "time:", new Date().toISOString());
-        const parsed = parseCsv(text);               // parsed = array of rows with row.id
-        const canonical = canonicalize(parsed);      // sorted array of ids -> JSON
+  function diffBetween(prevSerializedStr, currSerializedStr) {
+  let prev = [];
+  let curr = [];
+  try { prev = prevSerializedStr ? JSON.parse(prevSerializedStr) : []; } catch (e) { prev = []; }
+  try { curr = currSerializedStr ? JSON.parse(currSerializedStr) : []; } catch (e) { curr = []; }
+  const prevSet = new Set(prev);
+  const currSet = new Set(curr);
+  const added = curr.filter(x => !prevSet.has(x));
+  const removed = prev.filter(x => !currSet.has(x));
+  return { added, removed };
+}
 
-        if (initialLoad) {
-          // vid första lyckade inläsningen: applicera direkt så sidan inte är tom
-          initialLoad = false;
-          prevCanonical = canonical;
-          candidateCanonical = "";
-          candidateCount = 0;
-          allResults = parsed;
-          applyStateAndRender();
-          console.info("Initial data applied");
-          return;
-        }
+function fetchAndProcess() {
+  const url = CSV_URL + "&t=" + Date.now();
+  console.debug("Fetching:", url);
+  fetch(url, { cache: "no-store" })
+    .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
+    .then(text => {
+      const parsed = parseCsv(text);
+      const canonical = canonicalize(parsed); // JSON of sorted ids
 
-        if (canonical === prevCanonical) {
-          // ingen förändring mot accepterad state
-          candidateCanonical = "";
-          candidateCount = 0;
-          return;
-        }
+      // initial load: accept immediately
+      if (initialLoad) {
+        initialLoad = false;
+        prevCanonical = canonical;
+        candidateCanonical = "";
+        candidateCount = 0;
+        allResults = parsed;
+        applyStateAndRender();
+        console.info("Initial data applied:", allResults.length, "rows");
+        return;
+      }
 
-        if (canonical === candidateCanonical) {
-          candidateCount++;
-        } else {
-          // ny kandidat - börja räkna
-          candidateCanonical = canonical;
-          candidateCount = 1;
-        }
+      if (canonical === prevCanonical) {
+        // ingen förändring
+        candidateCanonical = "";
+        candidateCount = 0;
+        //console.debug("No change vs prev.");
+        return;
+      }
 
-        console.debug("Candidate seen", candidateCount, "times (needs", STABLE_REQUIRED, ")");
+      if (canonical === candidateCanonical) {
+        candidateCount++;
+      } else {
+        // ny kandidat: logga diff mot accepterad state för diagnostik
+        const d = diffBetween(prevCanonical, canonical);
+        console.info("New candidate detected. Added:", d.added.length, "Removed:", d.removed.length, "Sample added:", d.added.slice(0,5), "sample removed:", d.removed.slice(0,5));
+        candidateCanonical = canonical;
+        candidateCount = 1;
+      }
 
-        if (candidateCount >= STABLE_REQUIRED) {
-          // acceptera kandidat
-          prevCanonical = candidateCanonical;
-          candidateCanonical = "";
-          candidateCount = 0;
-          allResults = parsed;
-          applyStateAndRender();
-          console.info("Applied new stable data at", new Date().toISOString());
-        } else {
-          // vänta på nästa poll (gör inga DOM-ändringar nu)
-        }
-      })
-      .catch(err => {
-        console.error("Fel vid hämtning av CSV:", err);
-      });
-  }
+      if (candidateCount >= STABLE_REQUIRED) {
+        const d = diffBetween(prevCanonical, candidateCanonical);
+        prevCanonical = candidateCanonical;
+        candidateCanonical = "";
+        candidateCount = 0;
+        allResults = parsed;
+        applyStateAndRender();
+        console.info("Applied new stable data. Added:", d.added.length, "Removed:", d.removed.length);
+      }
+    })
+    .catch(err => {
+      console.error("Fel vid hämtning av CSV:", err);
+    });
+}
 
   // --- Använd prev state för att rendera UI ---
   function applyStateAndRender() {
