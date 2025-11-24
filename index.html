@@ -104,8 +104,8 @@
   // --- KONFIG ---
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=1512314119&single=true&output=csv";
   const DONATION_PER_RESULT = 50;
-  const REFRESH_MS = 3000;      // poll-intervall (ms). 3000 = 3s. Sänk för snabbare, höj för mindre trafik.
-  const STABLE_REQUIRED = 2;    // kräver samma ändring 2 polls i rad innan vi visar den. Sätt 1 för omedelbar visning.
+  const REFRESH_MS = 2000;      // poll-intervall (ms). 2000 = 2s. Sänk för snabbare, höj för mindre trafik.
+  const STABLE_REQUIRED = 1;    // kräver samma ändring 1 poll innan vi visar den. Sätt 1 för omedelbar visning.
 
   // --- intern state för stabilisering ---
   let prevCanonical = "";       // senast accepterade representation (sorted array av rowIds)
@@ -145,7 +145,14 @@
 function fetchAndProcess() {
   const url = CSV_URL + "&t=" + Date.now();
   console.debug("Fetching:", url);
-  fetch(url, { cache: "no-store" })
+  fetch(url, { 
+    cache: "no-store",
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  })
     .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
     .then(text => {
       const parsed = parseCsv(text);
@@ -164,9 +171,7 @@ function fetchAndProcess() {
       }
 
       if (canonical === prevCanonical) {
-        // ingen förändring
-        candidateCanonical = "";
-        candidateCount = 0;
+        // ingen förändring - behåll kandidat om den finns
         //console.debug("No change vs prev.");
         return;
       }
