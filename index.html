@@ -5,175 +5,40 @@
   <title>Jämtkraft World Cup 2025 - Resultat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      background: #fff9cc;
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      margin: 0;
-    }
-
-    h1 {
-      font-size: 60px;
-      margin: 30px 0 10px 0;
-      text-align: center;
-    }
-
-    #donationBox {
-      font-size: 90px;
-      font-weight: bold;
-      color: #E10600;
-      line-height: 1;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      text-align: center;
-      /* Stabiliserar layouten när siffror växlar i bredd */
-      min-width: 260px;
-      display: inline-block;
-      box-sizing: border-box;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .receiver {
-      font-size: 60px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .date-row {
-      margin-bottom: 7px;
-      font-size: 14px;
-    }
-
-    select {
-      font-size: 9px;
-      padding: 4px 8px;
-      margin-left: 8px;
-    }
-
-    .absolute-date {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      z-index: 1000;
-    }
-
-    .top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
-    }
-
-    .left-panel {
-      flex: 1;
-      margin-top: 100px;
-    }
-
-    .right-panel {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      margin-top: 100px;
-    }
-
-    .logo-box-main {
-      width: 900px;
-      max-width: 100%;
-    }
-
-    .logo-box-main img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    .receiver-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 16px;
-      justify-content: center;
-    }
-
-    .receiver-logo {
-      max-height: 60px;
-      width: auto;
-    }
-
-    .bottom-row {
-      margin-top: 300px;
-    }
-
-    .tables-area {
-      display: flex;
-      gap: 20px;
-    }
-
-    .cat-box {
-      flex: 1;
-      background: #006888;
-      padding: 24px;
-      border-radius: 16px;
-      color: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      min-width: 280px;
-      min-height: 240px;
-      box-sizing: border-box;
-    }
-
-    .cat-title {
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 20px;
-    }
-
-    th, td {
-      padding: 4px 6px;
-    }
-
-    th {
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.5);
-    }
-
-    td:nth-child(2), th:nth-child(2) {
-      text-align: right;
-    }
-
-    tbody tr:nth-child(odd) td {
-      background: rgba(255,255,255,0.1);
-    }
-
-    @media (max-width: 900px) {
-      body {
-        padding: 16px;
-      }
-
-      .top-row {
-        flex-direction: column;
-      }
-
-      .right-panel {
-        justify-content: center;
-      }
-
-      .bottom-row .tables-area {
-        flex-direction: column;
-      }
+    body { background: #fff9cc; font-family: Arial, sans-serif; padding: 30px; margin: 0; }
+    h1 { font-size: 60px; margin: 30px 0 10px 0; text-align: center; }
+    #donationBox { font-size: 90px; font-weight: bold; color: #E10600; line-height:1; margin-top:10px; margin-bottom:10px; text-align:center; min-width:240px; display:inline-block; font-variant-numeric:tabular-nums; }
+    .receiver { font-size: 60px; font-weight: bold; text-align:center; }
+    .date-row { margin-bottom:7px; font-size:14px; }
+    select { font-size:9px; padding:4px 8px; margin-left:8px; }
+    .absolute-date { position:absolute; top:10px; left:20px; z-index:1000; }
+    .top-row { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+    .left-panel { flex:1; margin-top:100px; }
+    .right-panel { flex:1; display:flex; justify-content:flex-end; align-items:center; margin-top:100px; }
+    .logo-box-main { width:900px; max-width:100%; }
+    .logo-box-main img { width:100%; height:auto; display:block; }
+    .receiver-row { display:flex; align-items:center; gap:12px; margin-top:16px; justify-content:center; }
+    .receiver-logo { max-height:60px; width:auto; }
+    .bottom-row { margin-top:300px; }
+    .tables-area { display:flex; gap:20px; }
+    .cat-box { flex:1; background:#006888; padding:24px; border-radius:16px; color:white; box-shadow:0 4px 10px rgba(0,0,0,0.2); min-width:280px; min-height:240px; box-sizing:border-box; }
+    .cat-title { text-align:center; font-size:26px; font-weight:bold; margin-bottom:6px; }
+    table { width:100%; border-collapse:collapse; font-size:20px; }
+    th, td { padding:4px 6px; }
+    th { text-align:left; border-bottom:1px solid rgba(255,255,255,0.5); }
+    td:nth-child(2), th:nth-child(2) { text-align:right; }
+    tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.1); }
+    @media (max-width:900px) {
+      body { padding:16px; }
+      .top-row { flex-direction:column; }
+      .right-panel { justify-content:center; }
+      .bottom-row .tables-area { flex-direction:column; }
     }
   </style>
 </head>
 <body>
 
-<!-- DATUM – absolut längst upp till vänster -->
+<!-- DATUM – separat, absolut längst upp till vänster -->
 <div class="date-row absolute-date">
   <label for="dateSelect"><b>Datum:</b></label>
   <select id="dateSelect"></select>
@@ -226,187 +91,208 @@
 </div>
 
 <script>
-  // CSV från publicerat Google Sheet (Rådata / Formulärsvar)
-  const CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
+  // --- KONFIG ---
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
+  const DONATION_PER_RESULT = 50;
+  const REFRESH_MS = 3000;      // poll-intervall (ms). 3000 = 3s. Sänk för snabbare, höj för mindre trafik.
+  const STABLE_REQUIRED = 2;    // kräver samma ändring 2 polls i rad innan vi visar den. Sätt 1 för omedelbar visning.
 
-  const DONATION_PER_RESULT = 50;   // 50 kr per rad
+  // --- intern state för stabilisering ---
+  let prevCanonical = "";       // senast accepterade representation (sorted array av rowIds)
+  let candidateCanonical = "";  // kandidat vi ser men inte accepterat än
+  let candidateCount = 0;
+  let initialLoad = true;
 
-  // Poll-intervall (ändra om du vill snabbare/långsammare)
-  const REFRESH_MS = 10000; // 10 sekunder
-
-  // Stabilitetskrav: kräver att samma förändring syns i N polls i rad innan den accepterats
-  const STABLE_REQUIRED = 2;
-
-  // Interna variabler för stabil polling / undvika onödig rendering
-  let prevSerialized = "";      // senast accepterade canonical-data
-  let candidateSerialized = ""; // kandidat som vi ser men ännu inte accepterat
-  let candidateCount = 0;       // antal gånger kandidat observerats i rad
-
-  let allResults = [];
+  let allResults = [];          // array med objekt { id, name, cat, date, time, timeStr }
   let selectedDate = null;
   let dateSelectEl = null;
 
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
-
     dateSelectEl.addEventListener("change", () => {
       selectedDate = dateSelectEl.value;
       renderForDate(selectedDate);
     });
 
-    // initial load + polling
-    loadData();
-    setInterval(loadData, REFRESH_MS);
+    // starta poll
+    fetchAndProcess();
+    setInterval(fetchAndProcess, REFRESH_MS);
   });
 
-  // Hämtar CSV från Google Sheets (utan cache)
-  function loadData() {
+  // --- Robust fetch + stabiliseringslogik ---
+  function fetchAndProcess() {
     fetch(CSV_URL + "&t=" + Date.now(), { cache: "no-store" })
       .then(res => {
-        if (!res.ok) throw new Error("HTTP-fel: " + res.status);
+        if (!res.ok) throw new Error("HTTP " + res.status);
         return res.text();
       })
       .then(text => {
-        // debuglogg - ta bort om du vill
         console.debug("Fetched CSV length:", text.length, "time:", new Date().toISOString());
+        const parsed = parseCsv(text);               // parsed = array of rows with row.id
+        const canonical = canonicalize(parsed);      // sorted array of ids -> JSON
 
-        const parsed = parseCsv(text);
-        const canonical = canonicalize(parsed);
+        if (initialLoad) {
+          // vid första lyckade inläsningen: applicera direkt så sidan inte är tom
+          initialLoad = false;
+          prevCanonical = canonical;
+          candidateCanonical = "";
+          candidateCount = 0;
+          allResults = parsed;
+          applyStateAndRender();
+          console.info("Initial data applied");
+          return;
+        }
 
-        // Om canonical matchar redan accepterad state -> inga förändringar
-        if (canonical === prevSerialized) {
-          candidateSerialized = "";
+        if (canonical === prevCanonical) {
+          // ingen förändring mot accepterad state
+          candidateCanonical = "";
           candidateCount = 0;
           return;
         }
 
-        // Om canonical matchar aktuell kandidat -> öka räkning
-        if (canonical === candidateSerialized) {
+        if (canonical === candidateCanonical) {
           candidateCount++;
         } else {
-          // ny kandidat - börja räkna på den
-          candidateSerialized = canonical;
+          // ny kandidat - börja räkna
+          candidateCanonical = canonical;
           candidateCount = 1;
         }
 
         console.debug("Candidate seen", candidateCount, "times (needs", STABLE_REQUIRED, ")");
 
-        // När kandidat syns tillräckligt många gånger blir den accepterad och renderas
         if (candidateCount >= STABLE_REQUIRED) {
-          prevSerialized = candidateSerialized;
-          candidateSerialized = "";
+          // acceptera kandidat
+          prevCanonical = candidateCanonical;
+          candidateCanonical = "";
           candidateCount = 0;
-
-          // uppdatera data och UI
           allResults = parsed;
-          updateDonation();
-          updateDateSelect();
-
-          if (!selectedDate && allResults.length) {
-            const dates = [...new Set(allResults.map(r => r.date))].sort();
-            selectedDate = dates[dates.length - 1];
-            if (dateSelectEl) dateSelectEl.value = selectedDate;
-          }
-
-          if (selectedDate) renderForDate(selectedDate);
+          applyStateAndRender();
           console.info("Applied new stable data at", new Date().toISOString());
         } else {
-          // annars: vänta på nästa poll, gör inga DOM-ändringar
+          // vänta på nästa poll (gör inga DOM-ändringar nu)
         }
       })
       .catch(err => {
         console.error("Fel vid hämtning av CSV:", err);
-        // vid fel: visa "Inga resultat" så man ser att något är knas
-        clearTables();
-        document.getElementById("donationBox").textContent = "0:-";
       });
   }
 
-  // Parsar CSV: Tidsstämpel / Namn / Tid / Kategori / Datum
+  // --- Använd prev state för att rendera UI ---
+  function applyStateAndRender() {
+    updateDonation();
+    updateDateSelect();
+    if (!selectedDate && allResults.length) {
+      const dates = [...new Set(allResults.map(r => r.date))].sort();
+      selectedDate = dates[dates.length - 1];
+      if (dateSelectEl) dateSelectEl.value = selectedDate;
+    }
+    if (selectedDate) renderForDate(selectedDate);
+  }
+
+  // --- CSV parsing (robust, hanterar citerade fält) ---
+  function splitCsvLine(line, delim) {
+    const cols = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQuotes && line[i+1] === '"') { // escaped quote
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (ch === delim && !inQuotes) {
+        cols.push(cur);
+        cur = "";
+      } else {
+        cur += ch;
+      }
+    }
+    cols.push(cur);
+    return cols;
+  }
+
   function parseCsv(text) {
-    const lines = text.trim().split(/\r?\n/);
-    if (lines.length < 2) return [];
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if (lines.length < 1) return [];
 
-    // ta bort ev. BOM-tecken
-    let headerLine = lines[0].replace(/^\uFEFF/, "");
-    const delim =
-      headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
-    const headers = headerLine.split(delim).map(h => h.trim());
+    // header
+    let headerLine = lines[0].replace(/^\uFEFF/, "").trim();
+    const delim = (headerLine.includes(";") && !headerLine.includes(",")) ? ";" : ",";
+    const rawHeaders = headerLine.split(delim).map(h => h.trim());
+    const headers = rawHeaders.map(h => h.toLowerCase());
 
-    // hitta kolumnindex (tillåt både "Tid" och "Tid (i sekunder)")
-    const idxName = headers.findIndex(h => h.toLowerCase() === "namn");
-    const idxTime = headers.findIndex(h => {
-      const low = h.toLowerCase();
-      return low === "tid" || low === "tid (i sekunder)";
-    });
-    const idxCat  = headers.findIndex(h => h.toLowerCase() === "kategori");
-    const idxDate = headers.findIndex(h => h.toLowerCase() === "datum");
+    // identifiera kolumner (tolerant)
+    const idxName = headers.findIndex(h => h === "namn" || h === "name");
+    const idxTime = headers.findIndex(h => h.includes("tid") || h.includes("time") || h.includes("sekunder"));
+    const idxCat  = headers.findIndex(h => h === "kategori" || h === "category");
+    const idxDate = headers.findIndex(h => h === "datum" || h === "date");
+    const idxTs   = headers.findIndex(h => h.includes("timestamp") || h.includes("tids") || h.includes("tidsstämpel") || h.includes("time stamp"));
 
     if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
-      console.error("Hittar inte alla nödvändiga kolumner i CSV:", headers);
+      console.error("Hittar inte alla nödvändiga kolumner i CSV. Headers:", rawHeaders);
       return [];
     }
 
     const results = [];
-
     for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      const cols = line.split(delim);
+      const raw = lines[i];
+      if (!raw || !raw.trim()) continue;
+      const cols = splitCsvLine(raw, delim);
       const name = (cols[idxName] || "").trim();
       const timeStr = (cols[idxTime] || "").trim();
       const cat = (cols[idxCat] || "").trim();
       const date = (cols[idxDate] || "").trim();
+      const ts = (idxTs !== -1 ? (cols[idxTs] || "").trim() : "");
 
-      // ignorera ofullständiga rader
+      // ignorera ofullständiga rader (viktig för Forms)
       if (!name || !date || !cat) continue;
 
-      let time = Number(timeStr.replace(",", "."));
-      if (!isFinite(time)) time = NaN;
+      const time = Number(timeStr.replace(",", "."));
+      const id = (ts && ts.length) ? ("TS:" + normalize(ts)) : ("FK:" + normalize(name) + "|" + normalize(cat) + "|" + normalize(date) + "|" + normalize(timeStr));
 
-      results.push({ name, cat, date, time, timeStr });
+      results.push({
+        id,
+        name,
+        cat,
+        date,
+        time: isFinite(time) ? time : NaN,
+        timeStr
+      });
     }
 
     return results;
   }
 
-  // Skapar en deterministisk representation av parsed-data
-  // så att ordningsvariationer i CSV inte räknas som förändring
-  function canonicalize(parsedArray) {
-    const rows = parsedArray.map(r => {
-      // välj fält som identifierar en rad; om du behöver fler fält lägg till dem här
-      return [r.date || "", r.cat || "", r.name || "", r.timeStr || ""].join("||");
-    });
-    rows.sort();
-    return JSON.stringify(rows);
+  function normalize(s) {
+    return String(s || "").replace(/\s+/g, " ").trim().replace(/,/g, ".");
   }
 
-  // Donation = 50 kr per resultat (alla dagar)
+  // canonicalize -> JSON string of sorted ids (deterministisk)
+  function canonicalize(parsedArray) {
+    const ids = parsedArray.map(r => r.id).sort();
+    return JSON.stringify(ids);
+  }
+
+  // --- UI helpers ---
   function updateDonation() {
     const total = allResults.length * DONATION_PER_RESULT;
     const box = document.getElementById("donationBox");
-    if (box.textContent !== total + ":-") {
-      box.textContent = total + ":-";
-    }
+    if (box.textContent !== total + ":-") box.textContent = total + ":-";
   }
 
-  // Uppdaterar datumlistan + håller kvar användarens val om möjligt
-  // Vi uppdaterar endast om datumlistan verkligen förändrats
   let prevDatesSerialized = "";
   function updateDateSelect() {
     const sel = dateSelectEl;
     if (!sel) return;
-
     const dates = [...new Set(allResults.map(r => r.date))].sort();
     const datesSerialized = JSON.stringify(dates);
-
     if (datesSerialized === prevDatesSerialized) return;
     prevDatesSerialized = datesSerialized;
 
     const previous = selectedDate;
-
     sel.innerHTML = "";
     dates.forEach(d => {
       const opt = document.createElement("option");
@@ -421,11 +307,8 @@
       return;
     }
 
-    if (previous && dates.includes(previous)) {
-      selectedDate = previous;
-    } else {
-      selectedDate = dates[dates.length - 1];
-    }
+    if (previous && dates.includes(previous)) selectedDate = previous;
+    else selectedDate = dates[dates.length - 1];
 
     sel.value = selectedDate;
   }
@@ -433,15 +316,12 @@
   function clearTables() {
     ["dam-body", "herr-body", "ungdom-body"].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML =
-        `<tr><td colspan="2">Inga resultat</td></tr>`;
+      if (el) el.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
     });
   }
 
-  // Fyll tabellerna för valt datum
   function renderForDate(date) {
     const rowsForDate = allResults.filter(r => r.date === date);
-
     fillCategory("Dam", "dam-body", rowsForDate);
     fillCategory("Herr", "herr-body", rowsForDate);
     fillCategory("Ungdom", "ungdom-body", rowsForDate);
@@ -451,47 +331,32 @@
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
 
-    // filtrera och sortera
-    let list = rows.filter(r => r.cat === categoryName);
+    let list = rows.filter(r => r.cat.toLowerCase() === categoryName.toLowerCase());
     list.sort((a, b) => {
       const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
       const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
       return aTime - bTime;
     });
 
-    list = list.slice(0, 5); // topp 5
+    list = list.slice(0, 5);
 
-    if (list.length === 0) {
-      const emptyHtml = `<tr><td colspan="2">Inga resultat</td></tr>`;
-      if (tbody.innerHTML !== emptyHtml) tbody.innerHTML = emptyHtml;
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
       return;
     }
 
-    // bygg ny HTML-sträng
+    // Bygg HTML och byt bara om annorlunda (minskar layout-shift)
     let html = "";
     list.forEach(r => {
       const timeText = isNaN(r.time) ? r.timeStr : r.time;
-      const nameEsc = escapeHtml(r.name);
-      const timeEsc = escapeHtml(String(timeText));
-      html += `<tr><td>${nameEsc}</td><td>${timeEsc}</td></tr>`;
+      html += `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(String(timeText))}</td></tr>`;
     });
 
-    if (tbody.innerHTML !== html) {
-      tbody.innerHTML = html;
-    }
+    if (tbody.innerHTML !== html) tbody.innerHTML = html;
   }
 
-  // Enkel HTML-escape
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, function (m) {
-      return ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[m];
-    });
+    return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]); });
   }
 </script>
 
