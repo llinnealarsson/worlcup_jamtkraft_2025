@@ -26,11 +26,6 @@
       margin-top: 10px;
       margin-bottom: 10px;
       text-align: center;
-      /* Stabiliserar layouten när siffror växlar i bredd */
-      min-width: 260px;
-      display: inline-block;
-      box-sizing: border-box;
-      font-variant-numeric: tabular-nums;
     }
 
     .receiver {
@@ -118,8 +113,6 @@
       color: white;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       min-width: 280px;
-      min-height: 240px;
-      box-sizing: border-box;
     }
 
     .cat-title {
@@ -231,17 +224,7 @@
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=851007371&single=true&output=csv";
 
   const DONATION_PER_RESULT = 50;   // 50 kr per rad
-
-  // Poll-intervall (ändra om du vill snabbare/långsammare)
-  const REFRESH_MS = 10000; // 10 sekunder
-
-  // Stabilitetskrav: kräver att samma förändring syns i N polls i rad innan den accepterats
-  const STABLE_REQUIRED = 2;
-
-  // Interna variabler för stabil polling / undvika onödig rendering
-  let prevSerialized = "";      // senast accepterade canonical-data
-  let candidateSerialized = ""; // kandidat som vi ser men ännu inte accepterat
-  let candidateCount = 0;       // antal gånger kandidat observerats i rad
+  const REFRESH_MS = 5000;          // uppdatera var 5:e sekund
 
   let allResults = [];
   let selectedDate = null;
@@ -255,7 +238,6 @@
       renderForDate(selectedDate);
     });
 
-    // initial load + polling
     loadData();
     setInterval(loadData, REFRESH_MS);
   });
@@ -268,52 +250,13 @@
         return res.text();
       })
       .then(text => {
-        // debuglogg - ta bort om du vill
-        console.debug("Fetched CSV length:", text.length, "time:", new Date().toISOString());
-
         const parsed = parseCsv(text);
-        const canonical = canonicalize(parsed);
 
-        // Om canonical matchar redan accepterad state -> inga förändringar
-        if (canonical === prevSerialized) {
-          candidateSerialized = "";
-          candidateCount = 0;
-          return;
-        }
+        // VIKTIGT: ersätt hela listan – då försvinner borttagna rader
+        allResults = parsed;
 
-        // Om canonical matchar aktuell kandidat -> öka räkning
-        if (canonical === candidateSerialized) {
-          candidateCount++;
-        } else {
-          // ny kandidat - börja räkna på den
-          candidateSerialized = canonical;
-          candidateCount = 1;
-        }
-
-        console.debug("Candidate seen", candidateCount, "times (needs", STABLE_REQUIRED, ")");
-
-        // När kandidat syns tillräckligt många gånger blir den accepterad och renderas
-        if (candidateCount >= STABLE_REQUIRED) {
-          prevSerialized = candidateSerialized;
-          candidateSerialized = "";
-          candidateCount = 0;
-
-          // uppdatera data och UI
-          allResults = parsed;
-          updateDonation();
-          updateDateSelect();
-
-          if (!selectedDate && allResults.length) {
-            const dates = [...new Set(allResults.map(r => r.date))].sort();
-            selectedDate = dates[dates.length - 1];
-            if (dateSelectEl) dateSelectEl.value = selectedDate;
-          }
-
-          if (selectedDate) renderForDate(selectedDate);
-          console.info("Applied new stable data at", new Date().toISOString());
-        } else {
-          // annars: vänta på nästa poll, gör inga DOM-ändringar
-        }
+        updateDonation();
+        updateDateSelect();
       })
       .catch(err => {
         console.error("Fel vid hämtning av CSV:", err);
@@ -360,7 +303,6 @@
       const cat = (cols[idxCat] || "").trim();
       const date = (cols[idxDate] || "").trim();
 
-      // ignorera ofullständiga rader
       if (!name || !date || !cat) continue;
 
       let time = Number(timeStr.replace(",", "."));
@@ -372,42 +314,21 @@
     return results;
   }
 
-  // Skapar en deterministisk representation av parsed-data
-  // så att ordningsvariationer i CSV inte räknas som förändring
-  function canonicalize(parsedArray) {
-    const rows = parsedArray.map(r => {
-      // välj fält som identifierar en rad; om du behöver fler fält lägg till dem här
-      return [r.date || "", r.cat || "", r.name || "", r.timeStr || ""].join("||");
-    });
-    rows.sort();
-    return JSON.stringify(rows);
-  }
-
   // Donation = 50 kr per resultat (alla dagar)
   function updateDonation() {
     const total = allResults.length * DONATION_PER_RESULT;
-    const box = document.getElementById("donationBox");
-    if (box.textContent !== total + ":-") {
-      box.textContent = total + ":-";
-    }
+    document.getElementById("donationBox").textContent = total + ":-";
   }
 
   // Uppdaterar datumlistan + håller kvar användarens val om möjligt
-  // Vi uppdaterar endast om datumlistan verkligen förändrats
-  let prevDatesSerialized = "";
   function updateDateSelect() {
     const sel = dateSelectEl;
-    if (!sel) return;
 
     const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const datesSerialized = JSON.stringify(dates);
-
-    if (datesSerialized === prevDatesSerialized) return;
-    prevDatesSerialized = datesSerialized;
-
     const previous = selectedDate;
 
     sel.innerHTML = "";
+
     dates.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d;
@@ -424,16 +345,17 @@
     if (previous && dates.includes(previous)) {
       selectedDate = previous;
     } else {
+      // välj senaste datumet
       selectedDate = dates[dates.length - 1];
     }
 
     sel.value = selectedDate;
+    renderForDate(selectedDate);
   }
 
   function clearTables() {
     ["dam-body", "herr-body", "ungdom-body"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML =
+      document.getElementById(id).innerHTML =
         `<tr><td colspan="2">Inga resultat</td></tr>`;
     });
   }
@@ -449,10 +371,11 @@
 
   function fillCategory(categoryName, tbodyId, rows) {
     const tbody = document.getElementById(tbodyId);
-    if (!tbody) return;
+    tbody.innerHTML = "";
 
-    // filtrera och sortera
     let list = rows.filter(r => r.cat === categoryName);
+
+    // snabbast tid först (lägst antal sekunder)
     list.sort((a, b) => {
       const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
       const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
@@ -461,36 +384,22 @@
 
     list = list.slice(0, 5); // topp 5
 
-    if (list.length === 0) {
-      const emptyHtml = `<tr><td colspan="2">Inga resultat</td></tr>`;
-      if (tbody.innerHTML !== emptyHtml) tbody.innerHTML = emptyHtml;
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
       return;
     }
 
-    // bygg ny HTML-sträng
-    let html = "";
     list.forEach(r => {
-      const timeText = isNaN(r.time) ? r.timeStr : r.time;
-      const nameEsc = escapeHtml(r.name);
-      const timeEsc = escapeHtml(String(timeText));
-      html += `<tr><td>${nameEsc}</td><td>${timeEsc}</td></tr>`;
-    });
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td");
+      const tdTime = document.createElement("td");
 
-    if (tbody.innerHTML !== html) {
-      tbody.innerHTML = html;
-    }
-  }
+      tdName.textContent = r.name;
+      tdTime.textContent = isNaN(r.time) ? r.timeStr : r.time;
 
-  // Enkel HTML-escape
-  function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, function (m) {
-      return ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[m];
+      tr.appendChild(tdName);
+      tr.appendChild(tdTime);
+      tbody.appendChild(tr);
     });
   }
 </script>
