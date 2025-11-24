@@ -114,6 +114,7 @@
   let allResults = [];
   let selectedDate = null;
   let dateSelectEl = null;
+  let previousResultCount = 0;  // Track previous count to prevent flickering
 
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
@@ -136,18 +137,26 @@
       })
       .then(text => {
         const parsed = parseCsv(text);
-        allResults = parsed;             // ersätt ALLA resultat
+        
+        // Prevent flickering: only update if we have at least as many results as before
+        // This handles cases where Google Sheets temporarily serves stale data
+        if (parsed.length >= previousResultCount) {
+          allResults = parsed;             // ersätt ALLA resultat
+          previousResultCount = parsed.length;
 
-        updateDonation();
-        updateDateSelect();
+          updateDonation();
+          updateDateSelect();
 
-        if (!selectedDate && allResults.length) {
-          const dates = [...new Set(allResults.map(r => r.date))].sort();
-          selectedDate = dates[dates.length - 1];   // senaste datumet
-          dateSelectEl.value = selectedDate;
+          if (!selectedDate && allResults.length) {
+            const dates = [...new Set(allResults.map(r => r.date))].sort();
+            selectedDate = dates[dates.length - 1];   // senaste datumet
+            dateSelectEl.value = selectedDate;
+          }
+
+          if (selectedDate) renderForDate(selectedDate);
+        } else {
+          console.log("Skippar uppdatering - färre resultat än förväntat:", parsed.length, "vs", previousResultCount);
         }
-
-        if (selectedDate) renderForDate(selectedDate);
       })
       .catch(err => {
         console.error("Fel vid hämtning av CSV:", err);
