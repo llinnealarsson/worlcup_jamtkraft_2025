@@ -7,7 +7,7 @@
   <style>
     body { background: #fff9cc; font-family: Arial, sans-serif; padding: 30px; margin: 0; }
     h1 { font-size: 60px; margin: 30px 0 10px 0; text-align: center; }
-    #donationBox { font-size: 90px; font-weight: bold; color: #E10600; line-height:1; margin-top:10px; margin-bottom:10px; text-align:center; min-width:260px; display:inline-block; box-sizing:border-box; font-variant-numeric:tabular-nums; }
+    #donationBox { font-size: 90px; font-weight: bold; color: #E10600; line-height:1; margin-top:10px; margin-bottom:10px; text-align:center; }
     .receiver { font-size: 60px; font-weight: bold; text-align:center; }
     .date-row { margin-bottom:7px; font-size:14px; }
     select { font-size:9px; padding:4px 8px; margin-left:8px; }
@@ -21,21 +21,16 @@
     .receiver-logo { max-height:60px; width:auto; }
     .bottom-row { margin-top:300px; }
     .tables-area { display:flex; gap:20px; }
-    .cat-box { flex:1; background:#006888; padding:24px; border-radius:16px; color:white; box-shadow:0 4px 10px rgba(0,0,0,0.2); min-width:280px; min-height:240px; box-sizing:border-box; }
+    .cat-box { flex:1; background:#006888; padding:24px; border-radius:16px; color:white; box-shadow:0 4px 10px rgba(0,0,0,0.2); min-width:280px; }
     .cat-title { text-align:center; font-size:26px; font-weight:bold; margin-bottom:6px; }
     table { width:100%; border-collapse:collapse; font-size:20px; }
     th, td { padding:4px 6px; }
     th { text-align:left; border-bottom:1px solid rgba(255,255,255,0.5); }
     td:nth-child(2), th:nth-child(2) { text-align:right; }
     tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.1); }
-    @media (max-width:900px) {
-      body { padding:16px; }
-      .top-row { flex-direction:column; }
-      .right-panel { justify-content:center; }
-      .bottom-row .tables-area { flex-direction:column; }
-    }
   </style>
 </head>
+
 <body>
 
 <div class="date-row absolute-date">
@@ -126,13 +121,13 @@
           initialLoad = false;
           prevSerialized = canonical;
           allResults = parsed;
-
           updateDonation();
           updateDateSelect();
 
           const dates = [...new Set(allResults.map(r => r.date))].sort();
           selectedDate = dates[dates.length - 1];
           document.getElementById("dateSelect").value = selectedDate;
+
           renderForDate(selectedDate);
           return;
         }
@@ -167,7 +162,7 @@
     const header = lines[0].split(",").map(h => h.trim());
 
     const idxName = header.indexOf("Namn");
-    const idxTime = header.findIndex(h => h.toLowerCase().includes("tid"));
+    const idxTime = header.indexOf("Tid (i sekunder)");   // ← FIXAD!
     const idxCat  = header.indexOf("Kategori");
     const idxDate = header.indexOf("Datum");
 
@@ -182,8 +177,7 @@
 
       if (!name || !cat || !date) continue;
 
-      let time = Number(timeStr.replace(",", "."));
-      if (!isFinite(time)) time = NaN;
+      const time = Number(timeStr.replace(",", "."));
 
       results.push({ name, cat, date, time, timeStr });
     }
@@ -252,8 +246,8 @@
   }
 
   function escapeHtml(str) {
-    return str.replace(/[&<>"']/g, m =>
-      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[m])
+    return str.replace(/[&<>"']/g,
+      m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])
     );
   }
 </script>
