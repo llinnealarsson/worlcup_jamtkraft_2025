@@ -26,6 +26,12 @@
       margin-top: 10px;
       margin-bottom: 10px;
       text-align: center;
+      /* Stabiliserar layouten när siffror växlar i bredd */
+      min-width: 260px;
+      display: inline-block;
+      box-sizing: border-box;
+      /* Tabbarade siffror så bredden inte hoppar lika mycket */
+      font-variant-numeric: tabular-nums;
     }
 
     .receiver {
@@ -113,6 +119,9 @@
       color: white;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       min-width: 280px;
+      /* Stabiliserar höjden så att sidans layout inte hoppar när tabellinnehåll ändras */
+      min-height: 240px;
+      box-sizing: border-box;
     }
 
     .cat-title {
@@ -230,6 +239,11 @@
   let selectedDate = null;
   let dateSelectEl = null;
 
+  // För att undvika onödiga DOM-uppdateringar
+  let prevSerialized = "";
+  let prevDatesSerialized = "";
+  let initialLoad = true;
+
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
 
@@ -238,6 +252,7 @@
       renderForDate(selectedDate);
     });
 
+    // första laddningen och sedan interval
     loadData();
     setInterval(loadData, REFRESH_MS);
   });
@@ -252,11 +267,35 @@
       .then(text => {
         const parsed = parseCsv(text);
 
-        // VIKTIGT: ersätt hela listan – då försvinner borttagna rader
+        // Serialisera för snabb jämförelse; om oförändrat: hoppa över DOM-uppdatering
+        const serialized = JSON.stringify(parsed);
+        if (serialized === prevSerialized) {
+          // inga ändringar i datan -> inget mer att göra
+          return;
+        }
+        prevSerialized = serialized;
+
+        // Ersätt hela listan i minnet
         allResults = parsed;
 
+        // uppdatera donation (kan göras även om datumlistan inte ändrats)
         updateDonation();
+
+        // uppdatera datumselect (bara om datumlistan förändrats)
         updateDateSelect();
+
+        // rendera valt datum (om selectedDate är satt)
+        if (!selectedDate && allResults.length) {
+          // första gången: välj senaste datum
+          const dates = [...new Set(allResults.map(r => r.date))].sort();
+          selectedDate = dates[dates.length - 1];
+          if (dateSelectEl) dateSelectEl.value = selectedDate;
+        }
+        if (selectedDate) {
+          renderForDate(selectedDate);
+        }
+
+        initialLoad = false;
       })
       .catch(err => {
         console.error("Fel vid hämtning av CSV:", err);
@@ -317,18 +356,29 @@
   // Donation = 50 kr per resultat (alla dagar)
   function updateDonation() {
     const total = allResults.length * DONATION_PER_RESULT;
-    document.getElementById("donationBox").textContent = total + ":-";
+    const box = document.getElementById("donationBox");
+    if (box.textContent !== total + ":-") {
+      box.textContent = total + ":-";
+    }
   }
 
   // Uppdaterar datumlistan + håller kvar användarens val om möjligt
+  // Vi uppdaterar endast om datumlistan verkligen förändrats
   function updateDateSelect() {
     const sel = dateSelectEl;
+    if (!sel) return;
 
     const dates = [...new Set(allResults.map(r => r.date))].sort();
+    const datesSerialized = JSON.stringify(dates);
+
+    // om samma datumlista som tidigare: gör ingenting
+    if (datesSerialized === prevDatesSerialized) return;
+    prevDatesSerialized = datesSerialized;
+
     const previous = selectedDate;
 
+    // bygg om options
     sel.innerHTML = "";
-
     dates.forEach(d => {
       const opt = document.createElement("option");
       opt.value = d;
@@ -345,17 +395,17 @@
     if (previous && dates.includes(previous)) {
       selectedDate = previous;
     } else {
-      // välj senaste datumet
+      // välj senaste datumet (nya)
       selectedDate = dates[dates.length - 1];
     }
 
     sel.value = selectedDate;
-    renderForDate(selectedDate);
   }
 
   function clearTables() {
     ["dam-body", "herr-body", "ungdom-body"].forEach(id => {
-      document.getElementById(id).innerHTML =
+      const el = document.getElementById(id);
+      if (el) el.innerHTML =
         `<tr><td colspan="2">Inga resultat</td></tr>`;
     });
   }
@@ -371,11 +421,10 @@
 
   function fillCategory(categoryName, tbodyId, rows) {
     const tbody = document.getElementById(tbodyId);
-    tbody.innerHTML = "";
+    if (!tbody) return;
 
+    // filtrera och sortera
     let list = rows.filter(r => r.cat === categoryName);
-
-    // snabbast tid först (lägst antal sekunder)
     list.sort((a, b) => {
       const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
       const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
@@ -384,26 +433,41 @@
 
     list = list.slice(0, 5); // topp 5
 
-    if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
+    // skapa en snabb HTML-representation och kontrollera om den är identisk med nuvarande.
+    if (list.length === 0) {
+      const emptyHtml = `<tr><td colspan="2">Inga resultat</td></tr>`;
+      if (tbody.innerHTML !== emptyHtml) tbody.innerHTML = emptyHtml;
       return;
     }
 
+    // bygg ny HTML-sträng (snabbare än DOM-manip för stora förändringar)
+    let html = "";
     list.forEach(r => {
-      const tr = document.createElement("tr");
-      const tdName = document.createElement("td");
-      const tdTime = document.createElement("td");
+      const timeText = isNaN(r.time) ? r.timeStr : r.time;
+      // använd enkla escape-funktioner för att undvika injektion (grundläggande)
+      const nameEsc = escapeHtml(r.name);
+      const timeEsc = escapeHtml(String(timeText));
+      html += `<tr><td>${nameEsc}</td><td>${timeEsc}</td></tr>`;
+    });
 
-      tdName.textContent = r.name;
-      tdTime.textContent = isNaN(r.time) ? r.timeStr : r.time;
+    if (tbody.innerHTML !== html) {
+      tbody.innerHTML = html;
+    }
+  }
 
-      tr.appendChild(tdName);
-      tr.appendChild(tdTime);
-      tbody.appendChild(tr);
+  // Enkel HTML-escape
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function (m) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[m];
     });
   }
 </script>
 
 </body>
 </html>
-
