@@ -7,7 +7,20 @@
   <style>
     body { background: #fff9cc; font-family: Arial, sans-serif; padding: 30px; margin: 0; }
     h1 { font-size: 60px; margin: 30px 0 10px 0; text-align: center; }
-    #donationBox { font-size: 90px; font-weight: bold; color: #E10600; line-height:1; margin:10px auto; text-align:center; min-width:240px; display:block; font-variant-numeric:tabular-nums; }
+
+    /* Centrerad, stadig summa */
+    #donationBox {
+      font-size: 90px;
+      font-weight: bold;
+      color: #E10600;
+      line-height: 1;
+      margin: 10px auto;     /* centrerar i mitten */
+      text-align: center;
+      min-width: 240px;
+      display: block;
+      font-variant-numeric: tabular-nums;
+    }
+
     .receiver { font-size: 60px; font-weight: bold; text-align:center; }
     .date-row { margin-bottom:7px; font-size:14px; }
     select { font-size:9px; padding:4px 8px; margin-left:8px; }
@@ -38,6 +51,7 @@
 </head>
 <body>
 
+<!-- DATUM – separat, absolut längst upp till vänster -->
 <div class="date-row absolute-date">
   <label for="dateSelect"><b>Datum:</b></label>
   <select id="dateSelect"></select>
@@ -90,17 +104,12 @@
 </div>
 
 <script>
-  // KONFIG — justera om du vill
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=1512314119&single=true&output=csv";
-  const DONATION_PER_RESULT = 50;
-  const REFRESH_MS = 2000;   // 2s för snabb uppdatering
-  const STABLE_REQUIRED = 1; // direktvisning (sätt 2 om du vill dämpa flimmer)
+  // LÄNKEN TILL FORM_RESPONSES-FLIKEN (kontrollera att gid = rätt flik)
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=1512314119&single=true&output=csv";
 
-  // intern state
-  let prevCanonical = "";
-  let candidateCanonical = "";
-  let candidateCount = 0;
-  let initialLoad = true;
+  const DONATION_PER_RESULT = 50;   // 50 kr per resultat
+  const REFRESH_MS = 3000;          // hämta nya resultat var 3:e sekund
 
   let allResults = [];
   let selectedDate = null;
@@ -108,252 +117,173 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
+
     dateSelectEl.addEventListener("change", () => {
       selectedDate = dateSelectEl.value;
       renderForDate(selectedDate);
     });
-    fetchAndProcess();
-    setInterval(fetchAndProcess, REFRESH_MS);
+
+    loadData();                        // första hämtningen
+    setInterval(loadData, REFRESH_MS); // sedan automatiskt
   });
 
-  // robust diff
-  function diffBetween(prevSerializedStr, currSerializedStr) {
-    let prev = [], curr = [];
-    try { prev = prevSerializedStr ? JSON.parse(prevSerializedStr) : []; } catch(e){ prev = []; }
-    try { curr = currSerializedStr ? JSON.parse(currSerializedStr) : []; } catch(e){ curr = []; }
-    const prevSet = new Set(prev), currSet = new Set(curr);
-    const added = curr.filter(x => !prevSet.has(x));
-    const removed = prev.filter(x => !currSet.has(x));
-    return { added, removed };
-  }
-
-  // huvudloop: hämta -> parse -> canonical -> stabilisering -> render
-  function fetchAndProcess() {
-    const url = CSV_URL + "&t=" + Date.now();
-    // DEBUG: logga fetch
-    console.debug("Fetch:", url);
-    fetch(url, { cache: "no-store" })
-      .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
-      .then(text => {
-        // snabb diagnos: visa första rader i console (ta bort senare om du vill)
-        // console.info("CSV head:", text.split(/\r?\n/).slice(0,6));
-
-        const parsed = parseCsv(text);            // array med objekt inkl .id
-        const canonical = canonicalize(parsed);   // JSON sorted ids
-
-        if (initialLoad) {
-          initialLoad = false;
-          prevCanonical = canonical;
-          allResults = parsed;
-          applyStateAndRender();
-          console.info("Initial data applied:", allResults.length, "rows");
-          return;
-        }
-
-        if (canonical === prevCanonical) {
-          candidateCanonical = "";
-          candidateCount = 0;
-          return;
-        }
-
-        if (canonical === candidateCanonical) candidateCount++; else {
-          const d = diffBetween(prevCanonical, canonical);
-          console.info("Candidate detected. Added:", d.added.length, "Removed:", d.removed.length, "sampleAdded:", d.added.slice(0,5));
-          candidateCanonical = canonical;
-          candidateCount = 1;
-        }
-
-        if (candidateCount >= STABLE_REQUIRED) {
-          const d = diffBetween(prevCanonical, candidateCanonical);
-          prevCanonical = candidateCanonical;
-          candidateCanonical = "";
-          candidateCount = 0;
-          allResults = parsed;
-          applyStateAndRender();
-          console.info("Applied stable data. Added:", d.added.length, "Removed:", d.removed.length);
-        }
+  // Hämta CSV utan cache och uppdatera sidan
+  function loadData() {
+    fetch(CSV_URL + "&t=" + Date.now(), { cache: "no-store" })
+      .then(res => {
+        if (!res.ok) throw new Error("HTTP-fel: " + res.status);
+        return res.text();
       })
-      .catch(err => console.error("Fetch error:", err));
+      .then(text => {
+        const parsed = parseCsv(text);
+        allResults = parsed;             // ersätt ALLA resultat
+
+        updateDonation();
+        updateDateSelect();
+
+        if (!selectedDate && allResults.length) {
+          const dates = [...new Set(allResults.map(r => r.date))].sort();
+          selectedDate = dates[dates.length - 1];   // senaste datumet
+          dateSelectEl.value = selectedDate;
+        }
+
+        if (selectedDate) renderForDate(selectedDate);
+      })
+      .catch(err => {
+        console.error("Fel vid hämtning av CSV:", err);
+        clearTables();
+        document.getElementById("donationBox").textContent = "0:-";
+      });
   }
 
-  // apply & render
-  function applyStateAndRender() {
-    updateDonation();
-    updateDateSelect();
-    if (!selectedDate && allResults.length) {
-      const dates = [...new Set(allResults.map(r => r.date))].sort();
-      selectedDate = dates[dates.length - 1];
-      if (dateSelectEl) dateSelectEl.value = selectedDate;
-    }
-    if (selectedDate) renderForDate(selectedDate);
-  }
-
-  // CSV-splittare (hanterar citat)
-  function splitCsvLine(line, delim) {
-    const cols = [];
-    let cur = "", inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') {
-        if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
-        else inQuotes = !inQuotes;
-      } else if (ch === delim && !inQuotes) {
-        cols.push(cur); cur = "";
-      } else cur += ch;
-    }
-    cols.push(cur);
-    return cols;
-  }
-
-  // parsing: robust headermatch + prioritering: submissionId -> timestamp -> fallback
+  // Tolkar CSV: Tidsstämpel / Namn / Tid (i sekunder) / Kategori / Datum
   function parseCsv(text) {
-    const lines = text.split(/\r?\n/);
-    if (!lines || lines.length < 1) return [];
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
 
-    // remove empty trailing lines
-    while (lines.length && lines[lines.length-1].trim() === "") lines.pop();
-    if (lines.length < 1) return [];
+    let headerLine = lines[0].replace(/^\uFEFF/, "");
+    const delim =
+      headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
+    const headers = headerLine.split(delim).map(h => h.trim());
 
-    let headerLine = lines[0].replace(/^\uFEFF/, "").trim();
-    const delim = (headerLine.includes(";") && !headerLine.includes(",")) ? ";" : ",";
-    const rawHeaders = headerLine.split(delim).map(h => h.trim());
-    const headers = rawHeaders.map(h => h.toLowerCase());
+    const idxName = headers.indexOf("Namn");
+    const idxTime = headers.indexOf("Tid (i sekunder)");
+    const idxCat  = headers.indexOf("Kategori");
+    const idxDate = headers.indexOf("Datum");
 
-    // detect columns
-    const idxSubmission = headers.findIndex(h => h.includes("submission") || h.includes("response id") || h.includes("responseid") || h.includes("entry") );
-    const idxTs = headers.findIndex(h => h.includes("timestamp") || h.includes("tidstämpel") || h.includes("tidst") || h.includes("time stamp"));
-    const idxName = headers.findIndex(h => h === "namn" || h === "name");
-    const idxCat  = headers.findIndex(h => h === "kategori" || h === "category");
-    const idxDate = headers.findIndex(h => h === "datum" || h === "date");
-
-    // find time column but avoid timestamp column
-    const idxTime = headers.findIndex((h,i) => {
-      if (i === idxTs || i === idxSubmission) return false;
-      if (h === "tid" || h === "tid (i sekunder)" || h === "tid (s)" || h === "time (s)" || h === "time") return true;
-      if (h.includes("sekunder") || h.includes("sek") || h.match(/^tid\b/)) return true;
-      return false;
-    });
-
-    // if required columns missing, try tolerant fallback by name contains
-    if (idxName === -1 || idxCat === -1 || idxDate === -1 || idxTime === -1) {
-      console.warn("Header mismatch, headers:", rawHeaders);
-      // attempt best-effort by trying to guess columns by substrings
-      // (we continue but will skip rows missing fields)
+    if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
+      console.error("Hittar inte alla nödvändiga kolumner i CSV:", headers);
+      return [];
     }
 
     const results = [];
-    // use Map to dedupe by id (if same id appears multiple times keep last)
-    const map = new Map();
 
     for (let i = 1; i < lines.length; i++) {
-      const raw = lines[i];
-      if (!raw || !raw.trim()) continue;
-      const cols = splitCsvLine(raw, delim);
+      const line = lines[i].trim();
+      if (!line) continue;
 
-      const name = (cols[idxName] || cols.find((c,j)=> headers[j] && headers[j].includes("namn") || false) || "").trim();
+      const cols = line.split(delim);
+      const name = (cols[idxName] || "").trim();
       const timeStr = (cols[idxTime] || "").trim();
-      const cat = (cols[idxCat] || cols.find((c,j)=> headers[j] && headers[j].includes("kategori") || false) || "").trim();
+      const cat = (cols[idxCat] || "").trim();
       const date = (cols[idxDate] || "").trim();
-      const submissionId = (idxSubmission !== -1 ? (cols[idxSubmission] || "").trim() : "");
-      const ts = (idxTs !== -1 ? (cols[idxTs] || "").trim() : "");
 
       if (!name || !date || !cat) continue;
 
-      const time = Number((timeStr||"").replace(",", "."));
-      let id = "";
-      if (submissionId) id = "SID:" + submissionId;
-      else if (ts) id = "TS:" + normalize(ts);
-      else id = "FK:" + normalize(name) + "|" + normalize(cat) + "|" + normalize(date) + "|" + normalize(timeStr);
+      let time = Number(timeStr.replace(",", "."));
+      if (!isFinite(time)) time = NaN;
 
-      map.set(id, {
-        id,
-        name,
-        cat,
-        date,
-        time: isFinite(time) ? time : NaN,
-        timeStr
-      });
+      results.push({ name, cat, date, time, timeStr });
     }
 
-    // return array from map (stable order: by timestamp if available else insertion)
-    const arr = Array.from(map.values());
-    // try to sort by id for deterministic canonicalization (prefer timestamp ids)
-    arr.sort((a,b) => {
-      // If both have TS ids, sort by the string (timestamp)
-      if (a.id.startsWith("TS:") && b.id.startsWith("TS:")) return a.id.localeCompare(b.id);
-      return a.id.localeCompare(b.id);
-    });
-    return arr;
+    return results;
   }
 
-  function normalize(s) { return String(s||"").replace(/\s+/g," ").trim().replace(/,/g, "."); }
-
-  function canonicalize(parsedArray) {
-    const ids = parsedArray.map(r => r.id).sort();
-    return JSON.stringify(ids);
-  }
-
+  // 50 kr per resultat
   function updateDonation() {
     const total = allResults.length * DONATION_PER_RESULT;
-    const box = document.getElementById("donationBox");
-    if (box.textContent !== total + ":-") box.textContent = total + ":-";
+    document.getElementById("donationBox").textContent = total + ":-";
   }
 
-  let prevDatesSerialized = "";
+  // Datum-dropdown
   function updateDateSelect() {
-    const sel = dateSelectEl;
-    if (!sel) return;
     const dates = [...new Set(allResults.map(r => r.date))].sort();
-    const datesSerialized = JSON.stringify(dates);
-    if (datesSerialized === prevDatesSerialized) return;
-    prevDatesSerialized = datesSerialized;
-
+    const sel = dateSelectEl;
     const previous = selectedDate;
+
     sel.innerHTML = "";
     dates.forEach(d => {
       const opt = document.createElement("option");
-      opt.value = d; opt.textContent = d; sel.appendChild(opt);
+      opt.value = d;
+      opt.textContent = d;
+      sel.appendChild(opt);
     });
 
-    if (dates.length === 0) { selectedDate = null; clearTables(); return; }
-    if (previous && dates.includes(previous)) selectedDate = previous;
-    else selectedDate = dates[dates.length - 1];
+    if (dates.length === 0) {
+      selectedDate = null;
+      clearTables();
+      return;
+    }
+
+    if (previous && dates.includes(previous)) {
+      selectedDate = previous;
+    } else {
+      selectedDate = dates[dates.length - 1];
+    }
+
     sel.value = selectedDate;
   }
 
   function clearTables() {
-    ["dam-body","herr-body","ungdom-body"].forEach(id=>{
-      const el = document.getElementById(id); if(el) el.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
+    ["dam-body", "herr-body", "ungdom-body"].forEach(id => {
+      document.getElementById(id).innerHTML =
+        `<tr><td colspan="2">Inga resultat</td></tr>`;
     });
   }
 
+  // Rita tabellerna för ett datum
   function renderForDate(date) {
-    const rowsForDate = allResults.filter(r=>r.date===date);
-    fillCategory("Dam","dam-body",rowsForDate);
-    fillCategory("Herr","herr-body",rowsForDate);
-    fillCategory("Ungdom","ungdom-body",rowsForDate);
+    const rowsForDate = allResults.filter(r => r.date === date);
+    fillCategory("Dam", "dam-body", rowsForDate);
+    fillCategory("Herr", "herr-body", rowsForDate);
+    fillCategory("Ungdom", "ungdom-body", rowsForDate);
   }
 
+  // Topp 5 per kategori
   function fillCategory(categoryName, tbodyId, rows) {
-    const tbody = document.getElementById(tbodyId); if(!tbody) return;
-    let list = rows.filter(r => r.cat.toLowerCase() === categoryName.toLowerCase());
-    list.sort((a,b)=>{
-      const aT = isNaN(a.time)? Number.POSITIVE_INFINITY : a.time;
-      const bT = isNaN(b.time)? Number.POSITIVE_INFINITY : b.time;
-      return aT - bT;
-    });
-    list = list.slice(0,5);
-    if (!list.length) { tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`; return; }
-    let html = "";
-    list.forEach(r => {
-      const timeText = isNaN(r.time) ? r.timeStr : r.time;
-      html += `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(String(timeText))}</td></tr>`;
-    });
-    if (tbody.innerHTML !== html) tbody.innerHTML = html;
-  }
+    const tbody = document.getElementById(tbodyId);
+    tbody.innerHTML = "";
 
-  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
+    let list = rows.filter(r => r.cat === categoryName);
+
+    list.sort((a, b) => {
+      const aTime = isNaN(a.time) ? Number.POSITIVE_INFINITY : a.time;
+      const bTime = isNaN(b.time) ? Number.POSITIVE_INFINITY : b.time;
+      return aTime - bTime;
+    });
+
+    list = list.slice(0, 5);
+
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="2">Inga resultat</td></tr>`;
+      return;
+    }
+
+    list.forEach(r => {
+      const tr = document.createElement("tr");
+      const tdName = document.createElement("td");
+      const tdTime = document.createElement("td");
+
+      tdName.textContent = r.name;
+      tdTime.textContent = isNaN(r.time) ? r.timeStr : r.time;
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdTime);
+      tbody.appendChild(tr);
+    });
+  }
 </script>
 
 </body>
 </html>
+
