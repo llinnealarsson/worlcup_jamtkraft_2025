@@ -241,14 +241,19 @@
     });
   }
 
-  // Rita tabellerna för ett datum
-  function renderForDate(date) {
-    const rowsForDate = allResults.filter(r => r.date === date);
-    fillCategory("Dam", "dam-body", rowsForDate);
-    fillCategory("Herr", "herr-body", rowsForDate);
-    fillCategory("Ungdom", "ungdom-body", rowsForDate);
-  }
 
+  function renderForDate(date) {
+  const rowsForDate = allResults.filter(r => r.date === date);
+  const dataKey = JSON.stringify(rowsForDate.map(r => ({ name: r.name, time: r.time, cat: r.cat })));
+  
+  if (dataKey === lastRenderedData) {
+    return;  // Skip render
+  }
+  
+  lastRenderedData = dataKey;
+  fillCategory("Dam", "dam-body", rowsForDate);
+  // ...
+}
   // Topp 5 per kategori
   function fillCategory(categoryName, tbodyId, rows) {
     const tbody = document.getElementById(tbodyId);
