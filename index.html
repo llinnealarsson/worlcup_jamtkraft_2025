@@ -114,12 +114,14 @@
   let allResults = [];
   let selectedDate = null;
   let dateSelectEl = null;
+  let lastRenderedData = null;  // Håll koll på senast renderade data för att undvika onödig rendering
 
   document.addEventListener("DOMContentLoaded", () => {
     dateSelectEl = document.getElementById("dateSelect");
 
     dateSelectEl.addEventListener("change", () => {
       selectedDate = dateSelectEl.value;
+      lastRenderedData = null;  // Återställ när användaren ändrar datum
       renderForDate(selectedDate);
     });
 
@@ -129,13 +131,24 @@
 
   // Hämta CSV utan cache och uppdatera sidan
   function loadData() {
-    fetch(CSV_URL + "&t=" + Date.now(), { cache: "no-store" })
+    fetch(CSV_URL + "&t=" + Date.now(), { 
+      cache: "no-store",
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
       .then(res => {
         if (!res.ok) throw new Error("HTTP-fel: " + res.status);
         return res.text();
       })
       .then(text => {
         const parsed = parseCsv(text);
+        
+        // Logga antal resultat för debugging
+        console.log("Laddade " + parsed.length + " resultat från CSV");
+        
         allResults = parsed;             // ersätt ALLA resultat
 
         updateDonation();
@@ -221,6 +234,7 @@
 
     if (dates.length === 0) {
       selectedDate = null;
+      lastRenderedData = null;
       clearTables();
       return;
     }
@@ -229,6 +243,7 @@
       selectedDate = previous;
     } else {
       selectedDate = dates[dates.length - 1];
+      lastRenderedData = null;  // Återställ om datumet ändras
     }
 
     sel.value = selectedDate;
@@ -244,6 +259,17 @@
   // Rita tabellerna för ett datum
   function renderForDate(date) {
     const rowsForDate = allResults.filter(r => r.date === date);
+    
+    // Skapa en unik nyckel för denna data för att jämföra med föregående rendering
+    const dataKey = JSON.stringify(rowsForDate.map(r => r.name + r.time + r.cat).sort());
+    
+    // Om data inte har ändrats, hoppa över rendering
+    if (dataKey === lastRenderedData) {
+      return;
+    }
+    
+    lastRenderedData = dataKey;
+    
     fillCategory("Dam", "dam-body", rowsForDate);
     fillCategory("Herr", "herr-body", rowsForDate);
     fillCategory("Ungdom", "ungdom-body", rowsForDate);
