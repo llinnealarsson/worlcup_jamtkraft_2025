@@ -104,9 +104,14 @@
 </div>
 
 <script>
-  // LÄNKEN TILL FORM_RESPONSES-FLIKEN (kontrollera att gid = rätt flik)
-  const CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6GcZTo8mTePabMdwXu3TUXNbdahHoxhRF4jBqiQcg7cz_GXG-RBWtFsBaQauoLnAF9PUjbfCo84Ht/pub?gid=1512314119&single=true&output=csv";
+  // ======= KONSTANTER =======
+  const SHEET_ID = "1tAOi5eIdDWxUh5AkWQa-q9j4yD10QjAwi1Hcg5k9tyI";   // ditt kalkylarks ID
+  const SHEET_NAME = "Formulärsvar 1";                                // flikens namn
+
+  // Google Sheets gviz-JSON (direkt mot arket, inte "publish to web")
+  const GVIZ_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?` +
+    `sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json`;
 
   const DONATION_PER_RESULT = 50;   // 50 kr per resultat
   const REFRESH_MS = 3000;          // hämta nya resultat var 3:e sekund
@@ -127,16 +132,29 @@
     setInterval(loadData, REFRESH_MS); // sedan automatiskt
   });
 
-  // Hämta CSV utan cache och uppdatera sidan
+  // ======= HÄMTA DATA FRÅN SHEET (GVIZ) =======
   function loadData() {
-    fetch(CSV_URL + "&t=" + Date.now(), { cache: "no-store" })
-      .then(res => {
-        if (!res.ok) throw new Error("HTTP-fel: " + res.status);
-        return res.text();
-      })
+    fetch(GVIZ_URL + "&t=" + Date.now(), { cache: "no-store" })
+      .then(res => res.text())
       .then(text => {
-        const parsed = parseCsv(text);
-        allResults = parsed;             // ersätt ALLA resultat
+        // gviz-json är inlindat i en funktion → plocka ut JSON-delen
+        const json = JSON.parse(text.substring(47, text.length - 2));
+        const rows = json.table.rows;
+
+        const parsed = rows.map(r => {
+          const c = r.c; // kolumner: [timestamp, name, time, category, date]
+
+          return {
+            // tidsstämpeln (c[0]) hoppar vi över – du kan spara den vid behov
+            name: (c[1]?.v || "").trim(),
+            timeStr: (c[2]?.v || "").toString(),
+            time: Number((c[2]?.v || "").toString().replace(",", ".")),
+            cat: (c[3]?.v || "").trim(),
+            date: (c[4]?.v || "").trim(),
+          };
+        }).filter(r => r.name && r.date && r.cat);
+
+        allResults = parsed;
 
         updateDonation();
         updateDateSelect();
@@ -150,62 +168,19 @@
         if (selectedDate) renderForDate(selectedDate);
       })
       .catch(err => {
-        console.error("Fel vid hämtning av CSV:", err);
+        console.error("Fel vid hämtning av gviz:", err);
         clearTables();
         document.getElementById("donationBox").textContent = "0:-";
       });
   }
 
-  // Tolkar CSV: Tidsstämpel / Namn / Tid (i sekunder) / Kategori / Datum
-  function parseCsv(text) {
-    const lines = text.trim().split(/\r?\n/);
-    if (lines.length < 2) return [];
-
-    let headerLine = lines[0].replace(/^\uFEFF/, "");
-    const delim =
-      headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
-    const headers = headerLine.split(delim).map(h => h.trim());
-
-    const idxName = headers.indexOf("Namn");
-    const idxTime = headers.indexOf("Tid (i sekunder)");
-    const idxCat  = headers.indexOf("Kategori");
-    const idxDate = headers.indexOf("Datum");
-
-    if (idxName === -1 || idxTime === -1 || idxCat === -1 || idxDate === -1) {
-      console.error("Hittar inte alla nödvändiga kolumner i CSV:", headers);
-      return [];
-    }
-
-    const results = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      const cols = line.split(delim);
-      const name = (cols[idxName] || "").trim();
-      const timeStr = (cols[idxTime] || "").trim();
-      const cat = (cols[idxCat] || "").trim();
-      const date = (cols[idxDate] || "").trim();
-
-      if (!name || !date || !cat) continue;
-
-      let time = Number(timeStr.replace(",", "."));
-      if (!isFinite(time)) time = NaN;
-
-      results.push({ name, cat, date, time, timeStr });
-    }
-
-    return results;
-  }
-
-  // 50 kr per resultat
+  // ======= 50 kr per resultat =======
   function updateDonation() {
     const total = allResults.length * DONATION_PER_RESULT;
     document.getElementById("donationBox").textContent = total + ":-";
   }
 
-  // Datum-dropdown
+  // ======= DATUM-DROPDOWN =======
   function updateDateSelect() {
     const dates = [...new Set(allResults.map(r => r.date))].sort();
     const sel = dateSelectEl;
@@ -241,7 +216,7 @@
     });
   }
 
-  // Rita tabellerna för ett datum
+  // ======= RITA TABELLERNA FÖR ETT DATUM =======
   function renderForDate(date) {
     const rowsForDate = allResults.filter(r => r.date === date);
     fillCategory("Dam", "dam-body", rowsForDate);
@@ -249,7 +224,7 @@
     fillCategory("Ungdom", "ungdom-body", rowsForDate);
   }
 
-  // Topp 5 per kategori
+  // ======= TOPP 5 PER KATEGORI =======
   function fillCategory(categoryName, tbodyId, rows) {
     const tbody = document.getElementById(tbodyId);
     tbody.innerHTML = "";
