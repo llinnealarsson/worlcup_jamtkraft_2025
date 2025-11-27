@@ -25,9 +25,24 @@
     .date-row { margin-bottom:7px; font-size:14px; }
     select { font-size:9px; padding:4px 8px; margin-left:8px; }
     .absolute-date { position:absolute; top:10px; left:20px; z-index:1000; }
-    .top-row { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+    .top-row {
+      display:flex;
+      justify-content:flex-start;
+      align-items:flex-start;
+      gap:80px; /* avstånd mellan vänster och höger sida */
+    }
+
     .left-panel { flex:1; margin-top:100px; }
-    .right-panel { flex:1; display:flex; justify-content:flex-end; align-items:center; margin-top:100px; }
+    .right-panel {
+      flex:1;
+      display:flex;
+      flex-direction:column; /* allt under varandra */
+      justify-content:flex-start;
+      align-items:flex-start;
+      gap:40px; /* avstånd mellan logga och tabeller */
+      margin-top:100px;
+    }
+    
     .logo-box-main { width:1000px; max-width:100%; }
     .logo-box-main img { width:100%; height:auto; display:block; }
     .receiver-row { display:flex; align-items:center; gap:12px; margin-top:16px; justify-content:center; }
@@ -58,6 +73,7 @@
 </div>
 
 <div class="top-row">
+  <!-- VÄNSTER KOLUMN: text + summa + mottagare + Jämtkraft -->
   <div class="left-panel">
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
@@ -66,17 +82,15 @@
       <div class="receiver">till Nattvandring</div>
       <img class="receiver-logo" src="nattvandring.png" alt="Nattvandring">
     </div>
-  </div>
 
-  <div class="right-panel">
+    <!-- Jämtkraftloggan under texten -->
     <div class="logo-box-main">
       <img src="jamtkraft_primar.png" alt="Jämtkraft">
     </div>
   </div>
-</div>
 
-<div class="bottom-row">
-  <div class="tables-area">
+  <!-- HÖGER KOLUMN: tabellerna på rad under varandra -->
+  <div class="right-panel">
     <div class="cat-box">
       <div class="cat-title">Dam</div>
       <table>
@@ -102,6 +116,7 @@
     </div>
   </div>
 </div>
+
 
 <script>
   // ======= KONSTANTER =======
