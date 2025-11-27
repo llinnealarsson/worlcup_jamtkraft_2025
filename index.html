@@ -146,19 +146,13 @@
           const c = r.c; // kolumner: [timestamp, name, time, category, date]
 
           return {
-  name: (c[1]?.v || "").trim(),
-  timeStr: (c[2]?.v || "").toString(),
-  time: parseFloat(
-          (c[2]?.v || "")
-            .toString()
-            .trim()
-            .replace(",", ".")
-            .replace(/[^0-9.]/g, "")   // ta bort ALLT utom siffror och punkt
-        ),
-  cat: (c[3]?.v || "").trim(),
-  date: (c[4]?.v || "").trim(),
-};
-
+            // tidsstämpeln (c[0]) hoppar vi över – du kan spara den vid behov
+            name: (c[1]?.v || "").trim(),
+            timeStr: (c[2]?.v || "").toString(),
+            time: Number((c[2]?.v || "").toString().replace(",", ".")),
+            cat: (c[3]?.v || "").trim(),
+            date: (c[4]?.v || "").trim(),
+          };
         }).filter(r => r.name && r.date && r.cat);
 
         allResults = parsed;
