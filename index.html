@@ -5,159 +5,48 @@
   <title>Jämtkraft World Cup 2025 - Resultat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-  background: #fff9cc;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 40px 60px;
-}
+    body { background: #fff9cc; font-family: Arial, sans-serif; padding: 30px; margin: 0; }
+    h1 { font-size: 60px; margin: 30px 0 10px 0; text-align: center; }
 
-/* Datum */
-.date-row {
-  margin-bottom: 7px;
-  font-size: 14px;
-}
-select {
-  font-size: 9px;
-  padding: 4px 8px;
-  margin-left: 8px;
-}
-.absolute-date {
-  position: absolute;
-  top: 10px;
-  left: 20px;
-  z-index: 1000;
-}
+    /* Centrerad, stadig summa */
+    #donationBox {
+      font-size: 90px;
+      font-weight: bold;
+      color: #E10600;
+      line-height: 1;
+      margin: 10px auto;
+      text-align: center;
+      min-width: 240px;
+      display: block;
+      font-variant-numeric: tabular-nums;
+    }
 
-/* --- HUVUDLAYOUT --- */
-/* vänster (svart ruta + röd ruta) och höger (gröna tabeller) */
-.layout {
-  max-width: 1600px;
-  margin: 40px auto;
-  display: flex;
-  justify-content: space-between;  /* flyttar tabellerna höger */
-  align-items: flex-start;
-  gap: 40px;
-}
-
-/* --- SVARTA RUTAN --- */
-.left-panel {
-  flex: 1.2;        /* större yta åt texten */
-  text-align: center;
-}
-
-/* Stor rubrik */
-h1 {
-  font-size: 72px;   /* större */
-  margin: 0 0 20px 0;
-}
-
-/* Summan */
-#donationBox {
-  font-size: 110px;  /* STÖRRE SUMMA */
-  font-weight: bold;
-  color: #E10600;
-  line-height: 1;
-  margin: 10px auto 20px auto;
-  min-width: 240px;
-  display: block;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Texten “till Nattvandring” */
-.receiver-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 10px;
-}
-.receiver {
-  font-size: 52px;
-  font-weight: bold;
-}
-.receiver-logo {
-  max-height: 65px;
-  width: auto;
-}
-
-/* --- RÖDA RUTAN: JÄMTKRAFTLOGGAN --- */
-.logo-box-main {
-  margin-top: 80px;       /* flyttar den NER */
-  width: 600px;           /* större logga */
-  margin-left: auto;      /* centrerar vågrätt */
-  margin-right: auto;
-}
-.logo-box-main img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* --- GRÖNA RUTAN: TABELLERNA --- */
-.right-panel {
-  flex: 1;                     /* begränsar tabellkolumnens bredd */
-  display: flex;
-  justify-content: center;     /* centrerar tabellerna horisontellt */
-}
-
-.tables-area {
-  width: 90%;                  /* större tabeller */
-  display: flex;
-  flex-direction: column;      /* under varandra */
-  gap: 40px;                   /* mer avstånd mellan dem */
-}
-
-/* Utseende på tabellrutorna */
-.cat-box {
-  background: #006888;
-  padding: 32px;               /* större rutor */
-  border-radius: 16px;
-  color: white;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  width: 100%;
-  min-height: 240px;
-}
-
-/* Tabellrubriker */
-.cat-title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-
-/* Tabellen */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 22px;             /* större text */
-}
-th, td {
-  padding: 6px 8px;
-}
-th {
-  text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-}
-td:nth-child(2), th:nth-child(2) {
-  text-align: right;
-}
-tbody tr:nth-child(odd) td {
-  background: rgba(255,255,255,0.1);
-}
-
-/* Mobil */
-@media (max-width: 900px) {
-  .layout {
-    flex-direction: column;
-    align-items: center;
-  }
-  .right-panel {
-    width: 100%;
-  }
-}
-
+    .receiver { font-size: 60px; font-weight: bold; text-align:center; }
+    .date-row { margin-bottom:7px; font-size:14px; }
+    select { font-size:9px; padding:4px 8px; margin-left:8px; }
+    .absolute-date { position:absolute; top:10px; left:20px; z-index:1000; }
+    .top-row { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+    .left-panel { flex:1; margin-top:100px; }
+    .right-panel { flex:1; display:flex; justify-content:flex-end; align-items:center; margin-top:100px; }
+    .logo-box-main { width:1000px; max-width:100%; }
+    .logo-box-main img { width:100%; height:auto; display:block; }
+    .receiver-row { display:flex; align-items:center; gap:12px; margin-top:16px; justify-content:center; }
+    .receiver-logo { max-height:60px; width:auto; }
+    .bottom-row { margin-top:300px; }
+    .tables-area { display:flex; gap:20px; }
+    .cat-box { flex:1; background:#006888; padding:24px; border-radius:16px; color:white; box-shadow:0 4px 10px rgba(0,0,0,0.2); min-width:280px; min-height:240px; box-sizing:border-box; }
+    .cat-title { text-align:center; font-size:26px; font-weight:bold; margin-bottom:6px; }
+    table { width:100%; border-collapse:collapse; font-size:20px; }
+    th, td { padding:4px 6px; }
+    th { text-align:left; border-bottom:1px solid rgba(255,255,255,0.5); }
+    td:nth-child(2), th:nth-child(2) { text-align:right; }
+    tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.1); }
+    @media (max-width:900px) {
+      body { padding:16px; }
+      .top-row { flex-direction:column; }
+      .right-panel { justify-content:center; }
+      .bottom-row .tables-area { flex-direction:column; }
+    }
   </style>
 </head>
 <body>
@@ -168,8 +57,7 @@ tbody tr:nth-child(odd) td {
   <select id="dateSelect"></select>
 </div>
 
-<div class="layout">
-  <!-- VÄNSTER: text, summa, mottagare, logga -->
+<div class="top-row">
   <div class="left-panel">
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
@@ -178,38 +66,39 @@ tbody tr:nth-child(odd) td {
       <div class="receiver">till Nattvandring</div>
       <img class="receiver-logo" src="nattvandring.png" alt="Nattvandring">
     </div>
+  </div>
 
+  <div class="right-panel">
     <div class="logo-box-main">
       <img src="jamtkraft_primar.png" alt="Jämtkraft">
     </div>
   </div>
+</div>
 
-  <!-- HÖGER: tabellerna under varandra -->
-  <div class="right-panel">
-    <div class="tables-area">
-      <div class="cat-box">
-        <div class="cat-title">Dam</div>
-        <table>
-          <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
-          <tbody id="dam-body"></tbody>
-        </table>
-      </div>
+<div class="bottom-row">
+  <div class="tables-area">
+    <div class="cat-box">
+      <div class="cat-title">Dam</div>
+      <table>
+        <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
+        <tbody id="dam-body"></tbody>
+      </table>
+    </div>
 
-      <div class="cat-box">
-        <div class="cat-title">Herr</div>
-        <table>
-          <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
-          <tbody id="herr-body"></tbody>
-        </table>
-      </div>
+    <div class="cat-box">
+      <div class="cat-title">Herr</div>
+      <table>
+        <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
+        <tbody id="herr-body"></tbody>
+      </table>
+    </div>
 
-      <div class="cat-box">
-        <div class="cat-title">Ungdom</div>
-        <table>
-          <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
-          <tbody id="ungdom-body"></tbody>
-        </table>
-      </div>
+    <div class="cat-box">
+      <div class="cat-title">Ungdom</div>
+      <table>
+        <thead><tr><th>Namn</th><th>Tid (s)</th></tr></thead>
+        <tbody id="ungdom-body"></tbody>
+      </table>
     </div>
   </div>
 </div>
