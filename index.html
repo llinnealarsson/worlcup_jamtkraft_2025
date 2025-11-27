@@ -257,6 +257,27 @@
       tbody.appendChild(tr);
     });
   }
+  body {
+  position: relative;
+  background: #fff9cc;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  background: url('jamtkraft_primar.png') no-repeat center center;
+  background-size: 600px; /* ändra efter behov */
+  opacity: 0.08; /* hur synlig loggan är */
+  
+  z-index: -1; /* så hamnar den bakom allt */
+  pointer-events: none; /* klick går igenom bilden */
+}
+
 </script>
 
 </body>
