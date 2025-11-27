@@ -6,158 +6,158 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background: #fff9cc;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 40px 60px;
-    }
+  background: #fff9cc;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 40px 60px;
+}
 
-    /* Datum uppe i hörnet */
-    .date-row {
-      margin-bottom: 7px;
-      font-size: 14px;
-    }
-    select {
-      font-size: 9px;
-      padding: 4px 8px;
-      margin-left: 8px;
-    }
-    .absolute-date {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      z-index: 1000;
-    }
+/* Datum */
+.date-row {
+  margin-bottom: 7px;
+  font-size: 14px;
+}
+select {
+  font-size: 9px;
+  padding: 4px 8px;
+  margin-left: 8px;
+}
+.absolute-date {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  z-index: 1000;
+}
 
-    /* Huvudlayout: vänster = text + logga, höger = tabeller */
-    .layout {
-      max-width: 1400px;
-      margin: 20px auto 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
-    }
+/* --- HUVUDLAYOUT --- */
+/* vänster (svart ruta + röd ruta) och höger (gröna tabeller) */
+.layout {
+  max-width: 1600px;
+  margin: 40px auto;
+  display: flex;
+  justify-content: space-between;  /* flyttar tabellerna höger */
+  align-items: flex-start;
+  gap: 40px;
+}
 
-    .left-panel {
-      flex: 1;
-      text-align: center;
-    }
+/* --- SVARTA RUTAN --- */
+.left-panel {
+  flex: 1.2;        /* större yta åt texten */
+  text-align: center;
+}
 
-    h1 {
-      font-size: 60px;
-      margin: 0 0 10px 0;
-    }
+/* Stor rubrik */
+h1 {
+  font-size: 72px;   /* större */
+  margin: 0 0 20px 0;
+}
 
-    /* Summan */
-    #donationBox {
-      font-size: 90px;
-      font-weight: bold;
-      color: #E10600;
-      line-height: 1;
-      margin: 10px auto;
-      min-width: 240px;
-      display: block;
-      font-variant-numeric: tabular-nums;
-    }
+/* Summan */
+#donationBox {
+  font-size: 110px;  /* STÖRRE SUMMA */
+  font-weight: bold;
+  color: #E10600;
+  line-height: 1;
+  margin: 10px auto 20px auto;
+  min-width: 240px;
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
 
-    .receiver-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 16px;
-      justify-content: center;
-    }
+/* Texten “till Nattvandring” */
+.receiver-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.receiver {
+  font-size: 52px;
+  font-weight: bold;
+}
+.receiver-logo {
+  max-height: 65px;
+  width: auto;
+}
 
-    .receiver {
-      font-size: 60px;
-      font-weight: bold;
-    }
+/* --- RÖDA RUTAN: JÄMTKRAFTLOGGAN --- */
+.logo-box-main {
+  margin-top: 80px;       /* flyttar den NER */
+  width: 600px;           /* större logga */
+  margin-left: auto;      /* centrerar vågrätt */
+  margin-right: auto;
+}
+.logo-box-main img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
-    .receiver-logo {
-      max-height: 60px;
-      width: auto;
-    }
+/* --- GRÖNA RUTAN: TABELLERNA --- */
+.right-panel {
+  flex: 1;                     /* begränsar tabellkolumnens bredd */
+  display: flex;
+  justify-content: center;     /* centrerar tabellerna horisontellt */
+}
 
-    /* Jämtkraft-loggan – längre ner och större */
-    .logo-box-main {
-      margin-top: 500px;         /* AVSTÅNDET NER FRÅN TEXTEN */
-      max-width: 1500px;         /* STORLEKEN PÅ LOGGAN (bredd) */
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .logo-box-main img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+.tables-area {
+  width: 90%;                  /* större tabeller */
+  display: flex;
+  flex-direction: column;      /* under varandra */
+  gap: 40px;                   /* mer avstånd mellan dem */
+}
 
-    /* Högerkolumn med tabellerna */
-    .right-panel {
-      flex: 0 0 700px;          /* bredd på "kolumnen" med tabeller */
-      display: flex;
-      justify-content: flex-start;
-    }
+/* Utseende på tabellrutorna */
+.cat-box {
+  background: #006888;
+  padding: 32px;               /* större rutor */
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  width: 100%;
+  min-height: 240px;
+}
 
-    .tables-area {
-      width: 100%;
-      display: flex;
-      flex-direction: column;   /* tabeller UNDER VARANDRA */
-      gap: 32px;                /* avstånd mellan tabellerna */
-    }
+/* Tabellrubriker */
+.cat-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
 
-    .cat-box {
-      background: #006888;
-      padding: 40px;
-      border-radius: 16px;
-      color: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      box-sizing: border-box;
-      width: 100%;             /* gör dem större i bredd */
-      min-height: 200px;
-    }
+/* Tabellen */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 22px;             /* större text */
+}
+th, td {
+  padding: 6px 8px;
+}
+th {
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+td:nth-child(2), th:nth-child(2) {
+  text-align: right;
+}
+tbody tr:nth-child(odd) td {
+  background: rgba(255,255,255,0.1);
+}
 
-    .cat-title {
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
+/* Mobil */
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .right-panel {
+    width: 100%;
+  }
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 25px;         /* textstorlek i tabellerna */
-    }
-    th, td {
-      padding: 4px 6px;
-    }
-    th {
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.5);
-    }
-    td:nth-child(2), th:nth-child(2) {
-      text-align: right;
-    }
-    tbody tr:nth-child(odd) td {
-      background: rgba(255,255,255,0.1);
-    }
-
-    /* Mobil / smal skärm */
-    @media (max-width: 900px) {
-      body {
-        padding: 16px;
-      }
-      .layout {
-        flex-direction: column;
-        align-items: center;
-        margin-top: 80px;
-      }
-      .right-panel {
-        width: 100%;
-        flex: 1;
-      }
-    }
   </style>
 </head>
 <body>
