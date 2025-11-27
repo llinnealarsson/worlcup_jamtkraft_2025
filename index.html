@@ -8,135 +8,154 @@
     body {
       background: #fff9cc;
       font-family: Arial, sans-serif;
-      padding: 30px;
       margin: 0;
+      padding: 40px 60px;
+    }
+
+    /* Datum uppe i hörnet */
+    .date-row {
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+    select {
+      font-size: 9px;
+      padding: 4px 8px;
+      margin-left: 8px;
+    }
+    .absolute-date {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    /* Huvudlayout: vänster = text + logga, höger = tabeller */
+    .layout {
+      max-width: 1400px;
+      margin: 80px auto 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 80px;
+    }
+
+    .left-panel {
+      flex: 1;
+      text-align: center;
     }
 
     h1 {
       font-size: 60px;
-      margin: 30px 0 10px 0;
-      text-align: left;
+      margin: 0 0 10px 0;
     }
 
-    /* Centrerad, stadig summa */
+    /* Summan */
     #donationBox {
       font-size: 90px;
       font-weight: bold;
       color: #E10600;
       line-height: 1;
-      margin: 10px 0;
-      text-align: left;
+      margin: 10px auto;
       min-width: 240px;
       display: block;
       font-variant-numeric: tabular-nums;
     }
 
+    .receiver-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
     .receiver {
       font-size: 60px;
       font-weight: bold;
-      text-align: left;
     }
 
-    .date-row { margin-bottom:7px; font-size:14px; }
-    select { font-size:9px; padding:4px 8px; margin-left:8px; }
-    .absolute-date { position:absolute; top:10px; left:20px; z-index:1000; }
-
-    /* Layout: vänster (text + logga), höger (tabeller i kolumn) */
-    .top-row {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:60px;
+    .receiver-logo {
+      max-height: 60px;
+      width: auto;
     }
 
-    .left-panel {
-      flex:1;
-      margin-top:80px;
-    }
-
-    .right-panel {
-      flex:1;
-      display:flex;
-      justify-content:flex-end;   /* trycks mot höger */
-      align-items:flex-start;
-      margin-top:80px;
-    }
-
-    .receiver-row {
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-top:16px;
-      justify-content:flex-start;
-    }
-
-    .receiver-logo { max-height:60px; width:auto; }
-
+    /* Jämtkraft-loggan – längre ner och större */
     .logo-box-main {
-      width:600px;      /* storlek på loggan */
-      max-width:100%;
-      margin-top:80px;  /* flyttar ner loggan */
+      margin-top: 80px;         /* AVSTÅNDET NER FRÅN TEXTEN */
+      max-width: 520px;         /* STORLEKEN PÅ LOGGAN (bredd) */
+      margin-left: auto;
+      margin-right: auto;
     }
-
     .logo-box-main img {
-      width:100%;
-      height:auto;
-      display:block;
+      width: 100%;
+      height: auto;
+      display: block;
     }
 
-    /* TABELLER HÖGER – under varandra */
-    .tables-column {
-      display:flex;
-      flex-direction:column;
-      gap:30px;           /* avstånd mellan tabellerna */
-      width:380px;        /* hur breda tabellerna är */
+    /* Högerkolumn med tabellerna */
+    .right-panel {
+      flex: 0 0 420px;          /* bredd på "kolumnen" med tabeller */
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .tables-area {
+      width: 100%;
+      display: flex;
+      flex-direction: column;   /* tabeller UNDER VARANDRA */
+      gap: 32px;                /* avstånd mellan tabellerna */
     }
 
     .cat-box {
-      background:#006888;
-      padding:24px;
-      border-radius:16px;
-      color:white;
-      box-shadow:0 4px 10px rgba(0,0,0,0.2);
-      box-sizing:border-box;
+      background: #006888;
+      padding: 24px;
+      border-radius: 16px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-sizing: border-box;
+      width: 100%;             /* gör dem större i bredd */
+      min-height: 200px;
     }
 
     .cat-title {
-      text-align:center;
-      font-size:24px;
-      font-weight:bold;
-      margin-bottom:10px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
     table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:20px;          /* textstorlek i tabell */
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;         /* textstorlek i tabellerna */
     }
-
     th, td {
-      padding:6px 10px;        /* mer luft i tabellen */
+      padding: 4px 6px;
     }
-
     th {
-      text-align:left;
-      border-bottom:1px solid rgba(255,255,255,0.5);
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+    }
+    td:nth-child(2), th:nth-child(2) {
+      text-align: right;
+    }
+    tbody tr:nth-child(odd) td {
+      background: rgba(255,255,255,0.1);
     }
 
-    td:nth-child(2), th:nth-child(2) { text-align:right; }
-    tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.1); }
-
-    @media (max-width:900px) {
-      body { padding:16px; }
-      .top-row { flex-direction:column; }
-      .right-panel {
-        justify-content:center;
-        margin-top:40px;
+    /* Mobil / smal skärm */
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
       }
-      .tables-column {
-        width:100%;
-        max-width:400px;
-        margin:0 auto;
+      .layout {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 80px;
+      }
+      .right-panel {
+        width: 100%;
+        flex: 1;
       }
     }
   </style>
@@ -149,8 +168,8 @@
   <select id="dateSelect"></select>
 </div>
 
-<div class="top-row">
-  <!-- VÄNSTER: text + logga -->
+<div class="layout">
+  <!-- VÄNSTER: text, summa, mottagare, logga -->
   <div class="left-panel">
     <h1>Tillsammans har vi samlat in</h1>
     <div id="donationBox">0:-</div>
@@ -165,9 +184,9 @@
     </div>
   </div>
 
-  <!-- HÖGER: tabeller under varandra -->
+  <!-- HÖGER: tabellerna under varandra -->
   <div class="right-panel">
-    <div class="tables-column">
+    <div class="tables-area">
       <div class="cat-box">
         <div class="cat-title">Dam</div>
         <table>
